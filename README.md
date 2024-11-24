@@ -8,14 +8,14 @@
 
 
 ## 安装
-使用以下命令通过pip安装mcPackets库：
+使用以下命令通过pip安装fileMapping库：
 ```shell
     pip install fileMapping
 ```
 
 
 ## 环境要求
-mcPackets库的开发环境是：
+fileMapping库的开发环境是：
     Python 3.9
     Windows 10
 
@@ -66,7 +66,7 @@ def main(app: Flask):
     @app.route("/")
     def root():
         # 从b中调用a的ip
-        return File.listOfFiles['a'].ip
+        return File.invoke['a'].ip
 
 
 ```

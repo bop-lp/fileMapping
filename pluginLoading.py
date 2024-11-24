@@ -112,6 +112,7 @@ class method:
             # 导入包
         except ModuleNotFoundError or TypeError as e:
             # 导入错误
+            print(f"\n\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
             self.pack = empty()
 
         for i in dir(self.pack):
@@ -123,6 +124,7 @@ class method:
         else:
             if self.pointer == None:
                 # 无 main
+                print(f"\n\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
                 return False
 
 
@@ -168,6 +170,7 @@ def f(path: os.path) -> packageMethod | fileMethod | bool:
             if 'main' in functions:
                 return True
 
+        print(f"\n\033[1;31m file: {path}\n导入错误 main函数: py文件没有main函数\033[0m")
         return False
 
     if package(path):

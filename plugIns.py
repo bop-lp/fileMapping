@@ -1,6 +1,6 @@
 import os
 
-from fileMapping import pluginLoading
+import pluginLoading
 
 def pathConversion(cpath: os.path, path: os.path) -> os.path:
     """
@@ -22,8 +22,20 @@ def pathConversion(cpath: os.path, path: os.path) -> os.path:
 
 
 class File:
+    """
+    callObject
+        - 调用对象
+    invoke
+        - 内行参数
+    returnValue
+        - 返回参数
+    public
+        - 公共
+    """
     callObject = {}
     invoke = {}
+    returnValue = {}
+    public = {}
     def __init__(self, absolutePath: os.path, screening=None):
         """
         映射文件夹下的Python文件或者包
@@ -46,13 +58,21 @@ class File:
             # self.callObject[key].run()
 
 
-    def run(self, *args, **kwargs):
+    def run(self, name: str = None, *args, **kwargs):
         """
         运行映射文件
         :return:
         """
-        for key, data in self.listOfFiles.items():
-            self.callObject[key].run(*args, **kwargs)
-            self.invoke[key] = self.callObject[key].pack
+        if name == None:
+            for key, data in self.listOfFiles.items():
+                if self.callObject[key]:
+                    self.returnValue[key] = self.callObject[key].run(*args, **kwargs)
+                    self.invoke[key] = self.callObject[key].pack
 
+        else:
+            if self.callObject.get(name, False):
+                self.returnValue[name] = self.callObject[name].run(*args, **kwargs)
+                self.invoke[name] = self.callObject[name].pack
 
+            else:
+                print(f"\n\033[1;31m 运行文件错误: 没有 {name} 文件 \033[0m")
