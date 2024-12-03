@@ -1,6 +1,6 @@
 import os
 
-import pluginLoading
+from . import pluginLoading
 
 def pathConversion(cpath: os.path, path: os.path) -> os.path:
     """
@@ -48,9 +48,10 @@ class File:
         if not ((not os.path.isabs(absolutePath)) or (not os.path.islink(absolutePath))):
             raise FileNotFoundError(f"不是一个有效的绝对路径。: '{absolutePath}'")
 
+
         self.listOfFiles = {
             i.split('.')[0]: os.path.join(absolutePath, i) for i in os.listdir(absolutePath)
-            if (i.split('.')[-1] in screening) and os.path.isfile(os.path.join(absolutePath, i))
+            if (i.split('.')[-1] in screening) or (os.path.isdir(os.path.join(absolutePath, i))) # and os.path.isfile(os.path.join(absolutePath, i))
         }
 
         for key, data in self.listOfFiles.items():
@@ -58,7 +59,7 @@ class File:
             # self.callObject[key].run()
 
 
-    def run(self, name: str = None, *args, **kwargs):
+    def run(self, *args, name: str = None, **kwargs):
         """
         运行映射文件
         :return:
