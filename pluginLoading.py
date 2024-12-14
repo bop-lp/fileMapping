@@ -7,10 +7,7 @@ import ast
 import importlib
 import importlib.util
 from typing import Any
-
 import inspect as inspectKB
-
-from rich import inspect
 
 from . import config
 
@@ -57,7 +54,7 @@ class method:
         运行包
         :return:
         """
-        if self.pointer == None:
+        if self.pointer is None:
             #
             return False
 
@@ -121,15 +118,21 @@ class packageMethod(method):
             self.pack = impo(f"{self.absolutePath}\\__init__.py", '')
             # 导入 __init__.py 获取保留参数
             fs = {
-                key: get(self.pack, key, data) for key, data in config.functionsKeepParameters.items()
+                key: get(self.pack, key, data) for key, data in config.functions.items()
             }
-            if fs['__file__'] == '':
-                fs['__file__'] = '__init__.py'
-            self.pack = impo(f"{self.absolutePath}\\{fs['__file__']}", fs['__function__'])
+
+            if fs[config.functionsName['__file__']] == '':
+                fs[config.functionsName['__file__']] = '__init__.py'
+
+            if fs[config.functionsName['__run__']] is False:
+                # 禁止运行
+                return False
+
+            self.pack = impo(f"{self.absolutePath}\\{fs[config.functionsName['__file__']]}", fs[config.functionsName['__function__']])
             # 导入包
-        except (ModuleNotFoundError, TypeError, ImportError) as e:
+        except (ModuleNotFoundError, TypeError, ImportError, FileNotFoundError) as e:
             # 导入错误
-            print(f"\n\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
+            print(f"\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
             self.pack = empty()
 
         for i in dir(self.pack):
@@ -141,7 +144,7 @@ class packageMethod(method):
         else:
             if self.pointer == None:
                 # 无 main
-                print(f"\n\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
+                print(f"\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
                 return False
 
 class fileMethod(method):

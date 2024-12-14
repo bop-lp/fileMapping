@@ -3,7 +3,7 @@
 ------
 
 # fileMapping
-## 当前版本 0.3.2
+## 当前版本 0.3.3
 用于快速调用文件夹下的py文件或者包
 
 
@@ -134,5 +134,5 @@ def pathConversion(cpath: os.path, path: os.path) -> os.path:
 
 ------
 
-## [更新日志](changelog.md)
+## [更新日志](https://github.com/bop-lp/fileMapping/blob/main/changelog.md)
 

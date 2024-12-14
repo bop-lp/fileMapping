@@ -2,6 +2,7 @@ import os
 
 from . import pluginLoading
 
+
 def pathConversion(cpath: os.path, path: os.path) -> os.path:
     """
     当要转化的文件目录在调用文件的临旁时,则可以用这个快速转化
@@ -36,7 +37,7 @@ class File:
     invoke = {}
     returnValue = {}
     public = {}
-    def __init__(self, absolutePath: os.path, screening=None):
+    def __init__(self, absolutePath: os.path, screening=None, config: dict = None):
         """
         映射文件夹下的Python文件或者包
         :param absolutePath: 当前的根目录绝对路径
