@@ -13,9 +13,9 @@
 
 
 ## 已经是默认值
-__file__ = 'main.py'
-__function__ = 'main'
-# 规定调用的文件和执行函数
+__run__ = True
+# 是否运行，默认是True
+
 
 ```
 
