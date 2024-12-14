@@ -1,5 +1,5 @@
 # 更新日志
-## fileMapping 0.3.2
+## fileMapping 0.3.3
 
 
 # 对比上次更新了什么？
