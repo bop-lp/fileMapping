@@ -1,3 +1,4 @@
+import sys
 
 
 functionsName = {
@@ -13,4 +14,9 @@ functions = {
     "__fileName__":  "main.py",
     "__function__": "main",
     "__run__": True,
+}
+
+log = {
+    "printPosition": sys.stdout,
+    "printLog": False
 }

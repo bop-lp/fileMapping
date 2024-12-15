@@ -6,9 +6,13 @@ import os
 import ast
 import importlib
 import importlib.util
+import sys
 from typing import Any
 import inspect as inspectKB
 
+from rich import inspect
+
+from . import empty as Empty
 from . import config
 
 
@@ -24,18 +28,17 @@ fileMethod(method)  文件类
 
 f 调用函数
 """
-class blacklist:
-    ...
+class blacklist: ...
 
 
 class empty:
     # 一个空函数/方法
     class main:
-        def __init__(self):
-            pass
+        def __init__(self): ...
 
     def __init__(self):
         self.main = self.main()
+
 
 class method:
     def __init__(self, path):
@@ -80,9 +83,11 @@ class method:
                     parameter = {}
 
             else:
-                return self.pointer(*args, **kwargs)
+                results = self.pointer(*args, **kwargs)
+                return results
 
-            return self.pointer(**parameter)
+            results = self.pointer(**parameter)
+            return results
 
         except TypeError as e:
             return False
@@ -128,23 +133,46 @@ class packageMethod(method):
                 # 禁止运行
                 return False
 
-            self.pack = impo(f"{self.absolutePath}\\{fs[config.functionsName['__file__']]}", fs[config.functionsName['__function__']])
+            # if fs[config.functionsName['__function__']] == '':
+            #     # 未指定函数名
+            #     # 只调用不运行
+            #     printlog(f"调用文件成功: {self.pack.__name__}", printLog=config.log['printLog'], color='32', printPosition=config.log['printPosition'])
+            #     self.pack =
+
+
+            # self.pack = impo(f"{self.absolutePath}\\{fs[config.functionsName['__file__']]}", fs[config.functionsName['__function__']])
+            # print(dir(self.pack))
             # 导入包
         except (ModuleNotFoundError, TypeError, ImportError, FileNotFoundError) as e:
             # 导入错误
-            print(f"\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
+            printlog(f"file: {self.path}\n导入错误 log: {e}", printLog=config.log['printLog'],
+                     color='31', printPosition=config.log['printPosition'])
+            # print(f"\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
             self.pack = empty()
+            fs = {config.functionsName['__function__']: False}
 
         for i in dir(self.pack):
-            if not i in dir(blacklist):
+            if not i in dir(Empty):
+                # 过滤黑名单
+
                 self.magicParameters[i] = getattr(self.pack, i)
                 if i == 'main':
                     self.pointer = getattr(self.pack, i)
 
         else:
-            if self.pointer == None:
+            if fs[config.functionsName['__function__']] == '':
+                # 未指定函数名
+                # 只调用不运行
+                self.pointer = empty()
+
+                return True
+                # printlog(f"调用文件成功: {self.pack.__name__}", printLog=config.log['printLog'], color='32', printPosition=config.log['printPosition'])
+
+            if self.pointer is None:
                 # 无 main
-                print(f"\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
+                printlog(f"file: {self.path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'],
+                         color='31', printPosition=config.log['printPosition'])
+                # print(f"\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
                 return False
 
 class fileMethod(method):
@@ -162,22 +190,27 @@ class fileMethod(method):
         try:
             self.pack = impo(self.absolutePath, 'main')
             # 导入包
-        except ModuleNotFoundError or TypeError as e:
+        except (ModuleNotFoundError, TypeError) as e:
             # 导入错误
-            print(f"\n\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
+            printlog(f"file: {self.path}\n导入错误 log: {e}", printLog=config.log['printLog'],
+                     color='31', printPosition=config.log['printPosition'])
+            # print(f"\n\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
             self.pack = empty()
 
         for i in dir(self.pack):
-            if not i in dir(blacklist):
+            if not i in dir(Empty):
                 self.magicParameters[i] = getattr(self.pack, i)
                 if i == 'main':
                     self.pointer = getattr(self.pack, i)
+                    break
 
         else:
-            print(15, self.pointer)
-            if self.pointer == None:
+            if self.pointer is None:
                 # 无 main
-                print(f"\n\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
+                printlog(f"file: {self.path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'],
+                         color='31', printPosition=config.log['printPosition'])
+
+                # print(f"\n\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
                 return False
 
 
@@ -212,7 +245,8 @@ def f(path: os.path) -> packageMethod | fileMethod | bool:
             if 'main' in functions:
                 return True
 
-        print(f"\n\033[1;31m file: {path}\n导入错误 main函数: py文件没有main函数\033[0m")
+        printlog(f"file: {path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
+        # print(f"\n\033[1;31m file: {path}\n导入错误 main函数: py文件没有main函数\033[0m")
         return False
 
     if os.path.isdir(path) and package(path):
@@ -224,3 +258,18 @@ def f(path: os.path) -> packageMethod | fileMethod | bool:
     else:
         return False
 
+
+def printlog(log: str, printPosition: sys.stdout = sys.stdout, color: str = '32', printLog: bool = True):
+    """
+    打印日志
+    :param log: 日志
+    :param printPosition: 打印位置
+    :param color: 颜色 31红色 32绿色 33黄色 34蓝色 35紫色 36青色 37白色
+    :return:
+    """
+    if printLog is True:
+        print(f"\033[1;{color}m{log}\033[0m", file=printPosition)
+        return True
+
+    else:
+        return True
