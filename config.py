@@ -1,4 +1,5 @@
 import sys
+import copy
 
 
 functionsName = {
@@ -56,3 +57,16 @@ error_list_a2 = (
     # 用于执行函数时发生的错误
     TypeError, Exception
 )
+
+#
+path = copy.copy(sys.path)[::-1]
+_ = []
+for i in path:
+    if i.endswith('zip'):
+        _.append(i)
+        break
+
+    else:
+        _.append(i)
+
+path = _[::-1]

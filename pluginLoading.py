@@ -128,11 +128,6 @@ class packageMethod(method):
     """包方法"""
     __name__ = 'packageMethod'
 
-    def get(self, func):
-        return {
-            value: getattr(func, value) if value in dir(func) else config.functions[value]
-            for value, data in config.functionsName.items()
-        }
 
 class fileMethod(method):
     """文件方法"""
@@ -196,7 +191,7 @@ def impo(file_path: os.path, callObject: str):
     path = copy.copy(sys.path)
     callObject = callObject.split('.')[0]  # 去除 .py
     try:
-        sys.path = [file_path]
+        sys.path = config.path+[file_path]
         the_api = importlib.import_module(callObject)
 
     except config.error_list_a2 as e:
