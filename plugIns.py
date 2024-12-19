@@ -44,13 +44,6 @@ def configConvertTodict(config) -> dict:
                 systemConfiguration[obj] = getattr(config, obj) if not isinstance(config, (dict, list, tuple)) else config[obj]
 
     return systemConfiguration
-    # sysCpL = config
-    # systemConfiguration = {} | {
-    #     obj: {
-    #         i: getattr(getattr(sysCpL, obj), i) for i in dir(getattr(sysCpL, obj))
-    #         if obj in dir(empty.empty)
-    #     } for obj in dir(sysCpL) if not obj.startswith("__")
-    # }
 
 
 class fileMapping_dict(dict):
@@ -121,17 +114,21 @@ class File:
             self.callObject[key] = pluginLoading.f(data)
 
 
-    def __run__(self, name, args, kwargs):
+    def __run__(self, name, kwargs):
         """
         运行映射文件
         :return:
         """
-        self.returnValue[name] = self.callObject[name].run(*args, **kwargs)
+        _ =self.returnValue[name] = self.callObject[name].run(**kwargs)
         self.invoke[name] = self.callObject[name].pack
 
-        pluginLoading.printlog(f"运行文件成功: {name} 文件", printPosition=self.printPosition, color="32", printLog=self.printLog)
+        if not isinstance(_, fileMappingConfig.error_list_a2):
+            pluginLoading.printlog(f"运行文件成功: {name} 文件", printPosition=self.printPosition, color="32", printLog=self.printLog)
 
-    def run(self, *args, name: str = None, **kwargs):
+        else:
+            pluginLoading.printlog(f"运行文件失败: {name} 文件\n\tlog: {_}", printPosition=self.printPosition, color="31", printLog=self.printLog)
+
+    def run(self, name: str = None, **kwargs):
         """
         运行映射文件
         :return:
@@ -139,16 +136,11 @@ class File:
         if name is None:
             for key, data in self.listOfFiles.items():
                 if self.callObject[key]:
-                    self.__run__(key, args, kwargs)
-                    # self.returnValue[key] = self.callObject[key].run(*args, **kwargs)
-                    # self.invoke[key] = self.callObject[key].pack
+                    self.__run__(key, kwargs)
 
         else:
             if self.callObject.get(name, False):
-                self.__run__(name, args, kwargs)
-                # self.returnValue[name] = self.callObject[name].run(*args, **kwargs)
-                # self.invoke[name] = self.callObject[name].pack
+                self.__run__(name, kwargs)
 
             else:
                 pluginLoading.printlog(f"运行文件错误: 没有 {name} 文件", printPosition=self.printPosition, color="31", printLog=self.printLog)
-                # print(f"\n\033[1;31m 运行文件错误: 没有 {name} 文件 \033[0m")

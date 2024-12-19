@@ -5,10 +5,11 @@ plugIns
 import os
 import ast
 import importlib
-import importlib.util
+# import importlib.util
 import sys
 from typing import Any
 import inspect as inspectKB
+import copy
 
 from rich import inspect
 
@@ -36,6 +37,8 @@ class empty:
     class main:
         def __init__(self): ...
 
+    def run(self, **kwargs): ...
+
     def __init__(self):
         self.main = self.main()
 
@@ -52,170 +55,94 @@ class method:
         self.importThePackage()
         # 导入包
 
-    def run(self, *args, **kwargs):
+    def run(self, **kwargs):
         """
         运行包
         :return:
         """
-        if self.pointer is None:
-            #
-            return False
-
-        else:
-            #
-            self.list = []
-
         try:
             sig = inspectKB.signature(self.pointer)
-            parameter_list = [
-                key for key, data in sig.parameters.items()
-            ]
-            if args == [] and kwargs == {}:
-                # 获取参数
-                if len(parameter_list) != 0:
-                    # 需要参数
-                    parameter = {
-                        parameter_list[i]: self.list[i] for i in range(len(self.list))
-                    }
+            parameterFilling = self.parameterFilling(list(sig.parameters.keys()), kwargs)
 
-                else:
-                    # 不需要参数
-                    parameter = {}
+            return self.pointer(**parameterFilling)
 
-            else:
-                results = self.pointer(*args, **kwargs)
-                return results
+        except config.error_list_a2 as e:
+            return e
 
-            results = self.pointer(**parameter)
-            return results
-
-        except TypeError as e:
-            return False
-
-    def importThePackage(self): ...
-
-
-def impo(file_path: os.path, callObject: str):
+    def parameterFilling(self, parameter: list, kwargs: dict):
         """
-        :param callObject: 'main'
-        :param file_path: 绝对路径
+        填充参数
+        :param parameter: 参数列表
+        :param kwargs: 关键字参数
         :return:
         """
-        spec = importlib.util.spec_from_file_location(callObject, file_path)
-        the_api = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(the_api)
-        return the_api
+        return {
+            key: value for key, value in kwargs.items() if key in parameter
+        }
+
+    def get(self, func):
+        return {
+            value: getattr(func, value) if value in dir(func) else config.functions[value]
+            for value, data in config.functionsName.items()
+        }
+
+    def importThePackage(self):
+        """
+        导入包
+        :return:
+        """
+        try:
+            self.pack = impo(
+                os.path.dirname(self.absolutePath), os.path.basename(self.path)
+            )  # 导入包
+            if isinstance(self.pack, config.error_list_a2):
+                raise self.pack
+
+            builtInParameters = self.get(self.pack)
+            # 获取包内的内定参数 & 没有就向config.functions中获取
+
+        except config.error_list_a2 as e:
+            printlog(f"file: {self.path}\n导入错误 log: {e}", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
+
+            self.pack = empty()
+            builtInParameters = config.functions_bad
+
+        if builtInParameters[config.functionsName['__run__']] is False:
+            # 禁止运行
+            self.pointer = empty().run
+            return False
+
+        elif builtInParameters[config.functionsName['__function__']] == '':
+            self.pointer = empty().run
+            return True
+
+        elif builtInParameters[config.functionsName['__function__']] in dir(self.pack):
+            self.pointer = getattr(self.pack, builtInParameters[config.functionsName['__function__']])
+
+        if self.pointer is None:
+            # 无 main
+            printlog(f"file: {self.path}\n导入错误 main函数: 包没有main函数", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
 
 
 class packageMethod(method):
     """包方法"""
     __name__ = 'packageMethod'
 
-    def importThePackage(self):
-        """
-        导入包
-        :return:
-        """
-        def get(module, name, data = False):
-            return getattr(module, name) if name in dir(module) else data
-
-        try:
-            self.pack = impo(f"{self.absolutePath}\\__init__.py", '')
-            # 导入 __init__.py 获取保留参数
-            fs = {
-                key: get(self.pack, key, data) for key, data in config.functions.items()
-            }
-
-            if fs[config.functionsName['__file__']] == '':
-                fs[config.functionsName['__file__']] = '__init__.py'
-
-            if fs[config.functionsName['__run__']] is False:
-                # 禁止运行
-                return False
-
-            # if fs[config.functionsName['__function__']] == '':
-            #     # 未指定函数名
-            #     # 只调用不运行
-            #     printlog(f"调用文件成功: {self.pack.__name__}", printLog=config.log['printLog'], color='32', printPosition=config.log['printPosition'])
-            #     self.pack =
-
-
-            # self.pack = impo(f"{self.absolutePath}\\{fs[config.functionsName['__file__']]}", fs[config.functionsName['__function__']])
-            # print(dir(self.pack))
-            # 导入包
-        except (ModuleNotFoundError, TypeError, ImportError, FileNotFoundError) as e:
-            # 导入错误
-            printlog(f"file: {self.path}\n导入错误 log: {e}", printLog=config.log['printLog'],
-                     color='31', printPosition=config.log['printPosition'])
-            # print(f"\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
-            self.pack = empty()
-            fs = {config.functionsName['__function__']: False}
-
-        for i in dir(self.pack):
-            if not i in dir(Empty):
-                # 过滤黑名单
-
-                self.magicParameters[i] = getattr(self.pack, i)
-                if i == 'main':
-                    self.pointer = getattr(self.pack, i)
-
-        else:
-            if fs[config.functionsName['__function__']] == '':
-                # 未指定函数名
-                # 只调用不运行
-                self.pointer = empty()
-
-                return True
-                # printlog(f"调用文件成功: {self.pack.__name__}", printLog=config.log['printLog'], color='32', printPosition=config.log['printPosition'])
-
-            if self.pointer is None:
-                # 无 main
-                printlog(f"file: {self.path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'],
-                         color='31', printPosition=config.log['printPosition'])
-                # print(f"\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
-                return False
+    def get(self, func):
+        return {
+            value: getattr(func, value) if value in dir(func) else config.functions[value]
+            for value, data in config.functionsName.items()
+        }
 
 class fileMethod(method):
     """文件方法"""
     __name__ = 'fileMethod'
 
-    def importThePackage(self):
-        """
-        导入包
-        :return:
-        """
-        if not (os.path.isfile(self.absolutePath) and self.absolutePath.split('.')[-1] == 'py'):
-            return False
-
-        try:
-            self.pack = impo(self.absolutePath, 'main')
-            # 导入包
-        except (ModuleNotFoundError, TypeError) as e:
-            # 导入错误
-            printlog(f"file: {self.path}\n导入错误 log: {e}", printLog=config.log['printLog'],
-                     color='31', printPosition=config.log['printPosition'])
-            # print(f"\n\033[1;31m file: {self.path}\n导入错误 log: {e}\033[0m")
-            self.pack = empty()
-
-        for i in dir(self.pack):
-            if not i in dir(Empty):
-                self.magicParameters[i] = getattr(self.pack, i)
-                if i == 'main':
-                    self.pointer = getattr(self.pack, i)
-                    break
-
-        else:
-            if self.pointer is None:
-                # 无 main
-                printlog(f"file: {self.path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'],
-                         color='31', printPosition=config.log['printPosition'])
-
-                # print(f"\n\033[1;31m file: {self.path}\n导入错误 main函数: py文件没有main函数\033[0m")
-                return False
-
 
 def f(path: os.path) -> packageMethod | fileMethod | bool:
     """
+    计划弃用
+
     判断 path 是否为 包/文件
     :return: 包 packageMethod 文件 fileMethod
     """
@@ -236,18 +163,18 @@ def f(path: os.path) -> packageMethod | fileMethod | bool:
         判断是否 是一个可调用文件
         :return: bool
         """
-        if os.path.isfile(path) and path.split('.')[-1] == 'py':
-            with open(path, encoding='utf-8') as f:
-                tree = ast.parse(f.read())
-
-            functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
-            # 获取类型和函数
-            if 'main' in functions:
-                return True
-
-        printlog(f"file: {path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
-        # print(f"\n\033[1;31m file: {path}\n导入错误 main函数: py文件没有main函数\033[0m")
-        return False
+        # if os.path.isfile(path) and path.split('.')[-1] == 'py':
+        #     with open(path, encoding='utf-8') as f:
+        #         tree = ast.parse(f.read())
+        #
+        #     functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+        #     # 获取类型和函数
+        #     if 'main' in functions:
+        #         return True
+        #
+        # printlog(f"file: {path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
+        # return False
+        return True
 
     if os.path.isdir(path) and package(path):
         return packageMethod(path)
@@ -257,6 +184,28 @@ def f(path: os.path) -> packageMethod | fileMethod | bool:
 
     else:
         return False
+
+
+def impo(file_path: os.path, callObject: str):
+    """
+    :param callObject: 'main'
+    :param file_path: 绝对路径
+    :return:
+
+    """
+    path = copy.copy(sys.path)
+    callObject = callObject.split('.')[0]  # 去除 .py
+    try:
+        sys.path = [file_path]
+        the_api = importlib.import_module(callObject)
+
+    except config.error_list_a2 as e:
+        sys.path = path
+        return e
+
+    else:
+        sys.path = path
+        return the_api
 
 
 def printlog(log: str, printPosition: sys.stdout = sys.stdout, color: str = '32', printLog: bool = True):
@@ -273,3 +222,6 @@ def printlog(log: str, printPosition: sys.stdout = sys.stdout, color: str = '32'
 
     else:
         return True
+
+
+

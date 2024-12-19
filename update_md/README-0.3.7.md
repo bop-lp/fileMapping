@@ -3,7 +3,7 @@
 ------
 
 # fileMapping
-## 当前版本 0.3.8
+## 当前版本 0.3.7
 用于快速调用文件夹下的py文件或者包
 
 
@@ -164,8 +164,11 @@ def main(route):
 ```python
 # C\\__init__.py
 
-from C import api  
+from plugins.C import api  # 目前只能通过这样的方式导入, 计划在以后的版本改进
 
+
+__fileName__ = ''
+# 运行指定为 __init__.py 文件
 
 __function__ = ''
 # 只调用不运行
@@ -251,20 +254,7 @@ def pathConversion(cpath: os.path, path: os.path) -> os.path:
 
 ```
 
-
-### `fileMapping.configConvertTodict`
-
-```python
-
-def configConvertTodict(config) -> dict:
-    """
-    将配置文件转换为dict格式
-    :param config: 配置文件
-    :return: dict 格式的配置文件
-    """
-
-```
 ------
 
-## [更新日志](changelog.md)
+## [更新日志](https://github.com/bop-lp/fileMapping/blob/main/changelog.md)
 
