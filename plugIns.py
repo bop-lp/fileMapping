@@ -1,9 +1,12 @@
 import os
 import sys
+import atexit
+import types
 
 from . import empty
 from . import pluginLoading
 from . import config as fileMappingConfig
+from . import string
 
 
 def pathConversion(cpath: os.path, path: os.path) -> os.path:
@@ -45,6 +48,39 @@ def configConvertTodict(config) -> dict:
 
     return systemConfiguration
 
+@atexit.register
+def end():
+    """
+    结束插件运行
+    :return:
+    """
+    if not fileMappingConfig.endTheTask:
+        return
+
+    for key, value in File.invoke.items():
+        if fileMappingConfig.functionsName["__end__"] in dir(value):
+            name = getattr(value, fileMappingConfig.functionsName["__end__"])
+            if isinstance(name, types.FunctionType):
+                try:
+                    name()
+
+                except fileMappingConfig.error_list_a2 as e:
+                    string.endFailed(key, e)
+
+                continue
+
+            if not name in dir(value):
+                string.endfunctionNotFound(key, name)
+                continue
+
+            pointer = getattr(value, name)
+            try:
+                pointer()
+                continue
+
+            except fileMappingConfig.error_list_a2 as e:
+                string.endFailed(key, e)
+
 
 class fileMapping_dict(dict):
     # 用于包装字典
@@ -55,7 +91,6 @@ class fileMapping_dict(dict):
 
         else:
             raise AttributeError(f"{self.__class__.__name__} has no attribute '{item}'")
-
 
 
 class File:
@@ -123,10 +158,10 @@ class File:
         self.invoke[name] = self.callObject[name].pack
 
         if not isinstance(_, fileMappingConfig.error_list_a2):
-            pluginLoading.printlog(f"运行文件成功: {name} 文件", printPosition=self.printPosition, color="32", printLog=self.printLog)
+            string.theRunFileWasSuccessful(name)
 
         else:
-            pluginLoading.printlog(f"运行文件失败: {name} 文件\n\tlog: {_}", printPosition=self.printPosition, color="31", printLog=self.printLog)
+            string.theRunFileFailed(name, _)
 
     def run(self, name: str = None, **kwargs):
         """
@@ -143,4 +178,4 @@ class File:
                 self.__run__(name, kwargs)
 
             else:
-                pluginLoading.printlog(f"运行文件错误: 没有 {name} 文件", printPosition=self.printPosition, color="31", printLog=self.printLog)
+                string.errorNoFile(name)

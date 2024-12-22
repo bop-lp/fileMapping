@@ -15,7 +15,7 @@ from rich import inspect
 
 from . import empty as Empty
 from . import config
-
+from . import string
 
 """
 empty 一个空 函数/方法
@@ -102,7 +102,7 @@ class method:
             # 获取包内的内定参数 & 没有就向config.functions中获取
 
         except config.error_list_a2 as e:
-            printlog(f"file: {self.path}\n导入错误 log: {e}", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
+            string.importError(self.path, e)
 
             self.pack = empty()
             builtInParameters = config.functions_bad
@@ -121,7 +121,7 @@ class method:
 
         if self.pointer is None:
             # 无 main
-            printlog(f"file: {self.path}\n导入错误 main函数: 包没有main函数", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
+            string.thereIsNoMainFunction(self.path)
 
 
 class packageMethod(method):
@@ -158,17 +158,6 @@ def f(path: os.path) -> packageMethod | fileMethod | bool:
         判断是否 是一个可调用文件
         :return: bool
         """
-        # if os.path.isfile(path) and path.split('.')[-1] == 'py':
-        #     with open(path, encoding='utf-8') as f:
-        #         tree = ast.parse(f.read())
-        #
-        #     functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
-        #     # 获取类型和函数
-        #     if 'main' in functions:
-        #         return True
-        #
-        # printlog(f"file: {path}\n导入错误 main函数: py文件没有main函数", printLog=config.log['printLog'], color='31', printPosition=config.log['printPosition'])
-        # return False
         return True
 
     if os.path.isdir(path) and package(path):
@@ -201,22 +190,4 @@ def impo(file_path: os.path, callObject: str):
     else:
         sys.path = path
         return the_api
-
-
-def printlog(log: str, printPosition: sys.stdout = sys.stdout, color: str = '32', printLog: bool = True):
-    """
-    打印日志
-    :param log: 日志
-    :param printPosition: 打印位置
-    :param color: 颜色 31红色 32绿色 33黄色 34蓝色 35紫色 36青色 37白色
-    :return:
-    """
-    if printLog is True:
-        print(f"\033[1;{color}m{log}\033[0m", file=printPosition)
-        return True
-
-    else:
-        return True
-
-
 

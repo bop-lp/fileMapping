@@ -1,37 +1,29 @@
 # 更新日志
-## fileMapping 0.3.9
+## fileMapping 0.3.10
 
 
 # 对比上次更新了什么？
 
-- 重写 pluginLoading.impo 的导入逻辑
-- 重写 pluginLoading.method.importThePackage 的导入逻辑
-- 重写 pluginLoading.method.run
-- config.py 新增参数
-- 移除 `__fileName__`
+- `__end__` 可以定义当程序结束时执行的函数，可以用来做一些清理工作。
 
 
-
-# 旧版本的功能变更
-
+# 如使用？
 ```python
-# 0.3.7 之前的版本
-
-from plugins.C import api
+# __init__.py
 
 
-```
-```python
-# 0.3.7 之后的版本
+def end():
+    print('程序结束')
 
-from C import api
+__end__ = 'end'
+# __end__ = end # 也可以直接传入函数
 
 
 ```
 
 ------
 
-|                 上版本                  |          下版本          |
-| :-------------------------------------: |:---------------------:|
-| [0.3.7](update_md%2Fchangelog-0.3.7.md) | [0.3.9](changelog.md) |
+|                   上版本                   |          下版本           |
+|:---------------------------------------:|:----------------------:|
+| [0.3.9](update_md%2Fchangelog-0.3.9.md) | [0.3.10](changelog.md) |
 

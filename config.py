@@ -5,9 +5,10 @@ import copy
 functionsName = {
     # 保留参数
     "__fileName__": "__fileName__",
-    "__file__": "__fileName__",
+    # "__file__": "__fileName__",
     "__function__": "__function__",
     "__run__": "__run__",
+    "__end__": "__end__",
 }
 
 functions = {
@@ -15,6 +16,7 @@ functions = {
     "__fileName__":  "main.py",
     "__function__": "main",
     "__run__": True,
+    "__end__": 'end'
 }
 """
 在fileMapping 0.3.5之前 __fileName__ 是可以使用的
@@ -34,7 +36,10 @@ __function__: str/ func 函数名 or 一个地址(可以直接调用的)
 __run__: bool 控制是否导入该文件/包
     - True: 导入该文件/包
     - False: 不导入该文件/包
-    
+
+__end__: str 控制程序结束时的结束任务
+    - 'end': 结束程序
+    - '': 不执行
 """
 
 functions_bad = {
@@ -70,3 +75,6 @@ for i in path:
         _.append(i)
 
 path = _[::-1]
+
+# 用于控制是否执行程序结束时的结束任务
+endTheTask = True
