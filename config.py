@@ -62,6 +62,7 @@ error_list_a2 = (
     # 用于执行函数时发生的错误
     TypeError, Exception
 )
+config_type_tuple = (dict, list, tuple)
 
 #
 path = copy.copy(sys.path)[::-1]

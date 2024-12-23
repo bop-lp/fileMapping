@@ -34,17 +34,21 @@ def configConvertTodict(config) -> dict:
     :param config: 配置文件
     :return: dict 格式的配置文件
     """
+    # config_type_tuple -> (dict, list, tuple)
+    if isinstance(config, fileMappingConfig.config_type_tuple):
+        return config
+    
     systemConfiguration = {}
-    for obj in dir(config) if not isinstance(config, (dict, list, tuple)) else config:
+    for obj in dir(config) if not isinstance(config, fileMappingConfig.config_type_tuple) else config:
         if obj.startswith("__"):
             continue
 
-        if isinstance(getattr(config, obj), (dict, list, tuple)) if not isinstance(config, (dict, list, tuple)) else isinstance(config[obj], (dict, list, tuple)):
+        if isinstance(getattr(config, obj), fileMappingConfig.config_type_tuple) if not isinstance(config, fileMappingConfig.config_type_tuple) else isinstance(config[obj], fileMappingConfig.config_type_tuple):
             systemConfiguration[obj] = configConvertTodict(getattr(config, obj))
 
         else:
             if not obj in dir(empty.empty):
-                systemConfiguration[obj] = getattr(config, obj) if not isinstance(config, (dict, list, tuple)) else config[obj]
+                systemConfiguration[obj] = getattr(config, obj) if not isinstance(config, fileMappingConfig.config_type_tuple) else config[obj]
 
     return systemConfiguration
 
