@@ -9,6 +9,8 @@ functionsName = {
     "__function__": "__function__",
     "__run__": "__run__",
     "__end__": "__end__",
+    "__level__": "__level__",
+    "__init__.py": "__init__.py"
 }
 
 functions = {
@@ -16,8 +18,11 @@ functions = {
     "__fileName__":  "main.py",
     "__function__": "main",
     "__run__": True,
-    "__end__": 'end'
+    "__end__": 'end',
+    "__level__": -1,
+    "__init__.py": "__init__.py"
 }
+
 """
 在fileMapping 0.3.5之前 __fileName__ 是可以使用的
 在fileMapping 0.3.5之后 __fileName__ 不可使用
@@ -40,6 +45,11 @@ __run__: bool 控制是否导入该文件/包
 __end__: str 控制程序结束时的结束任务
     - 'end': 结束程序
     - '': 不执行
+
+__level__: int 控制导入的等级
+    - 0：默认等级，不影响导入顺序
+    - n：由包自己控制，然后获取该整数，做出排序，然后进行导入
+
 """
 
 functions_bad = {
@@ -62,6 +72,11 @@ error_list_a2 = (
     # 用于执行函数时发生的错误
     TypeError, Exception
 )
+error_all = (
+    # 用于所有错误
+    Exception
+)
+
 config_type_tuple = (dict, list, tuple)
 
 #

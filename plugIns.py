@@ -2,6 +2,9 @@ import os
 import sys
 import atexit
 import types
+import re
+
+from rich import inspect
 
 from . import empty
 from . import pluginLoading
@@ -137,10 +140,20 @@ class File:
         # self
         self.printLog = printLog
         self.printPosition = printPosition
-        self.listOfFiles = {
-            i.split('.')[0]: os.path.join(absolutePath, i) for i in os.listdir(absolutePath)
-            if (i.split('.')[-1] in screening) or (os.path.isdir(os.path.join(absolutePath, i))) # and os.path.isfile(os.path.join(absolutePath, i))
-        }
+        ###
+        self.filePath = {}
+        self.listOfFiles = {}
+        for i in os.listdir(absolutePath):
+            path = os.path.join(absolutePath, i)
+            if os.path.isfile(path) and i.split('.')[-1] in screening:
+                # 包函数
+                self.listOfFiles[i.split('.')[0]] = path
+                self.filePath[i.split('.')[0]] = path
+
+            elif os.path.isdir(path) and os.path.isfile(os.path.join(path, fileMappingConfig.functionsName["__init__.py"])):
+                self.listOfFiles[i.split('.')[0]] = path
+                self.filePath[i.split('.')[0]] = os.path.join(path, fileMappingConfig.functionsName["__init__.py"])
+        ###
 
         # 加载配置文件
         if config:
@@ -148,10 +161,32 @@ class File:
             fileMappingConfig.log['printLog'] = self.printLog
             self.public['config'] = config
 
-        # 加载插件
-        for key, data in self.listOfFiles.items():
-            self.callObject[key] = pluginLoading.f(data)
+        run = {}
+        for key, path in self.filePath.items():
+            with open(path, "r", encoding="utf-8") as f:
+                s = '\n'.join([
+                    i for i in f if i.startswith(fileMappingConfig.functionsName["__level__"])
+                ]).strip()
 
+            try:
+                _ = {}
+                exec(s, {}, _)
+                __level__ = _.get("__level__", fileMappingConfig.functions[
+                    fileMappingConfig.functionsName["__level__"]
+                ])
+
+            except fileMappingConfig.error_all as e:
+                __level__ = fileMappingConfig.functions[
+                    fileMappingConfig.functionsName["__level__"]
+                ]
+
+            run[__level__] = run.get(__level__, []) + [key]
+
+        self._run = dict(sorted(run.items(), reverse=True))
+        for __level__, L in self._run.items():
+            for name in L:
+                self.callObject[name] = pluginLoading.f(self.listOfFiles[name])
+                self.invoke[name] = self.callObject[name].pack
 
     def __run__(self, name, kwargs):
         """
@@ -159,7 +194,7 @@ class File:
         :return:
         """
         _ =self.returnValue[name] = self.callObject[name].run(**kwargs)
-        self.invoke[name] = self.callObject[name].pack
+        # self.invoke[name] = self.callObject[name].pack
 
         if not isinstance(_, fileMappingConfig.error_list_a2):
             string.theRunFileWasSuccessful(name)
@@ -167,8 +202,33 @@ class File:
         else:
             string.theRunFileFailed(name, _)
 
+
+    def runAll(self, **kwargs):
+        """
+        运行所有映射文件
+        :return:
+        """
+        for key, data in self._run.items():
+            for i in data:
+                if self.callObject[i]:
+                    self.__run__(i, kwargs)
+
+    def runOne(self, name: str, **kwargs):
+        """
+        运行单个映射文件
+        :return:
+        """
+        if self.callObject.get(name, False):
+            self.__run__(name, kwargs)
+
+        else:
+            string.errorNoFile(name)
+
+
     def run(self, name: str = None, **kwargs):
         """
+        计划在后续版本移除
+
         运行映射文件
         :return:
         """

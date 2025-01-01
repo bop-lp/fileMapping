@@ -95,6 +95,7 @@ class method:
             self.pack = impo(
                 os.path.dirname(self.absolutePath), os.path.basename(self.path)
             )  # 导入包
+
             if isinstance(self.pack, config.error_list_a2):
                 raise self.pack
 
