@@ -1,3 +1,4 @@
+import os.path
 import sys
 import copy
 
@@ -63,6 +64,8 @@ log = {
     "printLog": False
 }
 
+# 用于保存当前文件的路径
+saveThePath = os.path.dirname(__file__)
 
 error_list_a1 = (
     # 用于导入模块时发生的错误

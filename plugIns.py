@@ -3,6 +3,7 @@ import sys
 import atexit
 import types
 import re
+import asyncio
 
 from rich import inspect
 
@@ -115,6 +116,7 @@ class File:
     invoke = fileMapping_dict({})
     returnValue = fileMapping_dict({})
     public = fileMapping_dict({})
+    path = None
 
     def __init__(self,
                  absolutePath: os.path,
@@ -140,6 +142,7 @@ class File:
         # self
         self.printLog = printLog
         self.printPosition = printPosition
+        self.path = absolutePath
         ###
         self.filePath = {}
         self.listOfFiles = {}
@@ -213,6 +216,7 @@ class File:
                 if self.callObject[i]:
                     self.__run__(i, kwargs)
 
+
     def runOne(self, name: str, **kwargs):
         """
         运行单个映射文件
@@ -243,3 +247,4 @@ class File:
 
             else:
                 string.errorNoFile(name)
+

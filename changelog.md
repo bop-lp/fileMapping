@@ -1,22 +1,26 @@
 # 更新日志
-## fileMapping 0.3.13
+## fileMapping 0.3.14
 
 
 # 对比上次更新了什么？
-
-- `__level__` 新增，用于控制导入插件的级别，默认为 `-1` 
-用于控制导入插件的级别，默认为 `-1` ，`-1` 表示最低级别
-由库作者决定是否使用 
+server 新增了 Pull_plugin & Upload_plugin 类，用于插件的下载与上传。
 
 # 如使用？
 ```python
 # __init__.py
+import os
 
 
-def end():
-    print('程序结束')
+from fileMapping import server
 
-__level__ = 5 # 设置级别为 5
+path = "plugIns"
+# 下载插件
+pull = server.Pull_plugin(path, "test")
+print(pull.logs)
+
+# 上传插件
+server.Upload_plugin(os.path.join(path, "test"), "test", "1.0.0")
+print(pull.logs)
 
 ```
 
@@ -25,5 +29,5 @@ __level__ = 5 # 设置级别为 5
 
 |                    上版本                    |          下版本           |
 |:-----------------------------------------:|:----------------------:|
-| [0.3.11](update_md%2Fchangelog-0.3.11.md) | [0.3.13](changelog.md) |
+| [0.3.13](update_md%2Fchangelog-0.3.13.md) | [0.3.14](changelog.md) |
 
