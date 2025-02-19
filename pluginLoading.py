@@ -3,18 +3,16 @@
 plugIns
 """
 import os
-import ast
 import importlib
 # import importlib.util
 import sys
+import traceback
 from typing import Any
 import inspect as inspectKB
 import copy
 
-from rich import inspect
-
-from . import empty as Empty
-from . import config
+from .information import fileMappingConfig as config
+from .helperFunctions_expansion import helperFunctions as hF
 from . import string
 
 """
@@ -52,8 +50,14 @@ class method:
         self.path: str = path
         self.absolutePath = self.path if os.path.isabs(self.path) == True else os.path.realpath(self.path)
         # 相对路径 & 绝对路径
-        self.importThePackage()
+        logs = self.__import__()
         # 导入包
+        if logs[0] is False:
+            self.logs = logs[-1]
+
+        else:
+            self.logs = True
+
 
     def run(self, **kwargs):
         """
@@ -61,24 +65,11 @@ class method:
         :return:
         """
         try:
-            sig = inspectKB.signature(self.pointer)
-            parameterFilling = self.parameterFilling(list(sig.parameters.keys()), kwargs)
-
+            parameterFilling = hF.parameterFilling(self.pointer, kwargs)
             return self.pointer(**parameterFilling)
 
         except config.error_list_a2 as e:
             return e
-
-    def parameterFilling(self, parameter: list, kwargs: dict):
-        """
-        填充参数
-        :param parameter: 参数列表
-        :param kwargs: 关键字参数
-        :return:
-        """
-        return {
-            key: value for key, value in kwargs.items() if key in parameter
-        }
 
     def get(self, func):
         return {
@@ -86,43 +77,50 @@ class method:
             for value, data in config.functionsName.items()
         }
 
-    def importThePackage(self):
+    def __import__(self) -> tuple:
         """
         导入包
-        :return:
         """
+        logs = {}
         try:
-            self.pack = impo(
+            logs[1] = {}
+            self.pack = py_import(
                 os.path.dirname(self.absolutePath), os.path.basename(self.path)
-            )  # 导入包
-
+            )
             if isinstance(self.pack, config.error_list_a2):
-                raise self.pack
-
-            builtInParameters = self.get(self.pack)
+                logs[1] = {"error": self.pack, "traceback": traceback.format_exc(), "absolutePath": self.absolutePath, "path": self.path}
+                return (False, logs)
+            # builtInParameters = self.get(self.pack)
             # 获取包内的内定参数 & 没有就向config.functions中获取
 
         except config.error_list_a2 as e:
-            string.importError(self.path, e)
-
+            logs[1] = {"error": e, "traceback": traceback.format_exc(), "absolutePath": self.absolutePath, "path": self.path}
             self.pack = empty()
-            builtInParameters = config.functions_bad
+            # builtInParameters = config.functions_bad
 
-        if builtInParameters[config.functionsName['__run__']] is False:
-            # 禁止运行
-            self.pointer = empty().run
-            return False
-
-        elif builtInParameters[config.functionsName['__function__']] == '':
-            self.pointer = empty().run
-            return True
-
-        elif builtInParameters[config.functionsName['__function__']] in dir(self.pack):
-            self.pointer = getattr(self.pack, builtInParameters[config.functionsName['__function__']])
+        # if builtInParameters[config.functionsName['__run__']] is False:
+        #     # 禁止运行
+        #     self.pointer = empty().run
+        #     logs[2] = {"builtInParameters": builtInParameters, "absolutePath": self.absolutePath, "path": self.path}
+        #     return (False, logs)
+        #
+        # elif builtInParameters[config.functionsName['__function__']] == '':
+        #     self.pointer = empty().run
+        #     logs[2] = {"builtInParameters": builtInParameters, "absolutePath": self.absolutePath, "path": self.path}
+        #     return (False, logs)
+        #
+        # elif builtInParameters[config.functionsName['__function__']] in dir(self.pack):
+        #     self.pointer = getattr(self.pack, builtInParameters[config.functionsName['__function__']])
+        #     logs[2] = {"builtInParameters": builtInParameters, "absolutePath": self.absolutePath, "path": self.path}
+        #     return (True, logs)
 
         if self.pointer is None:
             # 无 main
             string.thereIsNoMainFunction(self.path)
+            return (False, logs)
+
+        else:
+            return (True, logs)
 
 
 class packageMethod(method):
@@ -135,43 +133,19 @@ class fileMethod(method):
     __name__ = 'fileMethod'
 
 
-def f(path: os.path) -> packageMethod | fileMethod | bool:
+def f(path: str) -> packageMethod | fileMethod | bool:
     """
-    计划弃用
-
-    判断 path 是否为 包/文件
-    :return: 包 packageMethod 文件 fileMethod
+    
+    :param path: 
     """
-    def package(path: os.path, ) -> bool:
-        """
-        判断是否为包
-        __init__.py & main.py
-        :return: bool
-        """
-        if os.path.isdir(path) and os.path.isfile(os.path.join(path, "__init__.py")):
-            # 判断函数是否是为包
-            return True
-
-        return False
-
-    def file(path: os.path) -> bool:
-        """
-        判断是否 是一个可调用文件
-        :return: bool
-        """
-        return True
-
-    if os.path.isdir(path) and package(path):
-        return packageMethod(path)
-
-    elif os.path.isfile(path) and file(path):
-        return fileMethod(path)
+    if path.endswith('__init__.py'):
+        return packageMethod(os.path.dirname(path))
 
     else:
-        return False
+        return fileMethod(path)
 
 
-def impo(file_path: os.path, callObject: str):
+def py_import(file_path: os.path, callObject: str):
     """
     :param callObject: 'main'
     :param file_path: 绝对路径

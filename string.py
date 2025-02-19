@@ -1,4 +1,4 @@
-from . import config as cg
+from .information import fileMappingConfig as cg
 import sys
 
 

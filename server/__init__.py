@@ -26,7 +26,7 @@ except ImportError as e:
 
 class Pull_plugin:
     def __init__(self, path: os.path, plugin_name: str,
-                 pull_url: str="txt.fileMapping.pull.78ya.top",
+                 pull_url: str="txt.fileMapping.78ya.top",
                  pullValidation: bool=False,
                  MD5_value_validation: bool=False,
                  SH1_value_validation: bool=False,
@@ -369,37 +369,4 @@ class Upload_plugin:
             self.logs[5]["data"] = {"error": e, "data": locals(), "traceback_error": traceback.format_exc()}
 
             return e
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

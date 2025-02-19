@@ -16,7 +16,6 @@ class MyStream:
         pass
 
 
-
 def pull_DNS_TXT(domain: str) -> str:
     """
     解析域名的TXT记录
@@ -27,7 +26,6 @@ def pull_DNS_TXT(domain: str) -> str:
     """
     try:
         import dns.resolver
-
 
         # 解析域名的 TXT 记录
         answer = dns.resolver.resolve(domain, 'TXT').rrset.items
@@ -40,8 +38,7 @@ def pull_DNS_TXT(domain: str) -> str:
         return e
 
 
-
-def pip_install(package_name: str, pip_accelerationSource=None, pip_install_print: bool=False) -> bool:
+def pip_install(package_name: str, pip_accelerationSource=None, pip_install_print: bool = False) -> bool:
     """
     安装依赖包
     :param package_name: 依赖包名称
@@ -87,7 +84,6 @@ def pip_install(package_name: str, pip_accelerationSource=None, pip_install_prin
 
         # 无法安装依赖包 & 导入依赖包
         return e
-
 
 
 class folderCompression:
@@ -148,7 +144,7 @@ class folderCompression:
             return e
 
 
-def file_md5(file_path: str) -> FileNotFoundError | str:
+def file_md5(file_path: str) -> FileNotFoundError | str | Exception:
     """
     此函数计算给定文件的 MD5 值。
     :param file_path: 文件路径。
