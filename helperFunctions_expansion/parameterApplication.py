@@ -8,7 +8,6 @@ import shutil
 import functools
 import os
 
-
 from . import empty
 
 
@@ -27,7 +26,11 @@ def ApplyParameter(self_info) -> list:
 
     for i in l:
         func = i(self_info)
-        func.init()
+        try:
+            func.init()
+        except Exception as e:
+            self_info.logs['parameterApplication']['error'].append({func: e})
+
         if hasattr(func, 'end'):
             end_list.append(func.end)
 
@@ -59,16 +62,21 @@ class framework:
 class TemporaryFolders:
     def __init__(self, self_info: dict):
         self.self_info = self_info
-        self.path = os.path.join(self_info.path, self_info.public.config['temporaryFolders'])
+        self.temporaryFolders = True
+        if not self_info.path in [False, True, None, '']:  # temporaryFolders 关闭
+            self.path = os.path.join(self_info.path, self_info.public.config['temporaryFolders'])
 
-        self.information_temporaryFolders = self.self_info.information["temporaryFolders"] = {}   # 临时文件夹信息
-        self.logs = self.self_info.logs["temporaryFolders"] = {"error": []}
-        self.create_path = []
-        self.init_tmp = False
-        # 用于判断临时的文件夹是否自主创建，如果是的话则在结束时删除
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
-            self.init_tmp = True
+            self.information_temporaryFolders = self.self_info.information["temporaryFolders"] = {}   # 临时文件夹信息
+            self.logs = self.self_info.logs["temporaryFolders"] = {"error": []}
+            self.create_path = []
+            self.init_tmp = False
+            # 用于判断临时的文件夹是否自主创建，如果是的话则在结束时删除
+            if not os.path.exists(self.path):
+                os.mkdir(self.path)
+                self.init_tmp = True
+
+        else:
+            self.temporaryFolders = False
 
     def __mkdir(self, temporaryFolders):
         path = os.path.join(self.path, temporaryFolders)
@@ -85,6 +93,9 @@ class TemporaryFolders:
             return False
 
     def init(self):
+        if not self.temporaryFolders:
+            return False
+
         for key, value in self.self_info.information.file_info.items():
             temporaryFolders = value['__temporaryFolders__']
             if temporaryFolders is None:
@@ -110,25 +121,29 @@ class function:
     def __init__(self, self_info: dict):
         self.self_info = self_info
 
-    def __empty__(self, pointer):
-        pointer = empty.empty()
-
-        return pointer
+    def __empty__(self, key):
+        self.self_info.callObject[key].pointer = empty.empty().run
+        # pointer = empty.empty()
+        #
+        # return pointer
 
 
     def init(self):
         for key, value in self.self_info.information.file_info.items():
+            # print(key, value['__function__'])
             if value['__function__'] in [None, '']:
                 # self.self_info.callObject[key].pointer = empty.empty()
-                self.__empty__(self.self_info.callObject[key].pointer)
+                # print("[012]>? ", key, value['__function__'])
+                self.__empty__(key)
+                # self.__empty__(self.self_info.callObject[key].pointer)
 
             else:
                 try:
                     self.self_info.callObject[key].pointer = getattr(self.self_info.callObject[key].pack, value['__function__'])
 
                 except AttributeError as e:
-                    self.__empty__(self.self_info.callObject[key].pointer)
-
+                    self.__empty__(key)
+                    # self.__empty__(self.self_info.callObject[key].pointer)
 
 @wrapper
 class run:
@@ -138,6 +153,38 @@ class run:
 
     def init(self):
         for key, value in self.self_info.information.file_info.items():
+            # print(key, value['__run__'])
             if value['__run__'] is False:
-                self.self_info.callObject[key].pointer = empty.empty()
+                self.self_info.callObject[key].pointer = empty.empty().run
+
+@wrapper
+class readRegistration:
+    def __init__(self, self_info: dict):
+        """
+        register.threadRegistration
+
+        :param self_info:
+        """
+        self.self_info = self_info
+        self.info = self_info.information["readRegistration"]
+        self.logs = self_info.logs["readRegistration"] = {"error": []}
+
+    def init(self):
+        func_list = {}
+        for key, value in self.info.items():
+            level = value['level']
+            if level not in func_list:
+                func_list[level] = []
+
+            func_list[level].append(key)
+
+        func_list = sorted(func_list.items(), key=lambda x: x[0])
+        for level, func_list in func_list:
+            for func in func_list:
+                try:
+                    func(**self.info[func]['kwargs'])
+
+                except Exception as e:
+                    self.self_info.logs['readRegistration']['error'].append({func: e})
+
 

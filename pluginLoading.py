@@ -44,7 +44,7 @@ class empty:
 class method:
     def __init__(self, path):
         self.pointer = None
-        self.pack: Any| empty
+        self.pack: Any| empty = None
         self.magicParameters: dict[str: Any] = {}
         # 调用对象
         self.path: str = path
@@ -69,6 +69,7 @@ class method:
             return self.pointer(**parameterFilling)
 
         except config.error_list_a2 as e:
+            a = traceback.format_exc()
             return e
 
     def get(self, func):
@@ -96,6 +97,7 @@ class method:
         except config.error_list_a2 as e:
             logs[1] = {"error": e, "traceback": traceback.format_exc(), "absolutePath": self.absolutePath, "path": self.path}
             self.pack = empty()
+            self.pointer = self.pack.run
             # builtInParameters = config.functions_bad
 
         # if builtInParameters[config.functionsName['__run__']] is False:
@@ -114,7 +116,7 @@ class method:
         #     logs[2] = {"builtInParameters": builtInParameters, "absolutePath": self.absolutePath, "path": self.path}
         #     return (True, logs)
 
-        if self.pointer is None:
+        if (self.pointer is None) and (self.pack is None):
             # 无 main
             string.thereIsNoMainFunction(self.path)
             return (False, logs)

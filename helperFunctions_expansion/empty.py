@@ -1,6 +1,6 @@
 
 
-class empty: ...
+# class empty: ...
 
 # 谢谢你的使用!
 

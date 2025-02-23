@@ -13,7 +13,7 @@ import types
 # except ImportError:
 #     pass
 
-from . import information
+from . import information as fileMapping_information
 from .helperFunctions_expansion import helperFunctions
 from .helperFunctions_expansion.helperFunctions import fileMapping_dict
 from .helperFunctions_expansion import multithreading
@@ -26,8 +26,8 @@ from .information import fileMappingConfig as fileMappingConfig
 from . import string
 from . import register
 
-
-Application = fileMapping_dict({})
+Application: fileMapping_information.fileMapping_dict = fileMapping_information.Application
+# Application = fileMapping_dict({})
 
 
 class File:
@@ -45,12 +45,19 @@ class File:
     logs
         - 日志
     """
-    callObject = fileMapping_dict({})
-    invoke = fileMapping_dict({})
-    returnValue = fileMapping_dict({})
-    public = fileMapping_dict({})
-    information = fileMapping_dict({})
-    logs = fileMapping_dict({"run": 1})
+    callObject: fileMapping_information.fileMapping_dict = fileMapping_information.callObject
+    invoke: fileMapping_information.fileMapping_dict = fileMapping_information.invoke
+    returnValue: fileMapping_information.fileMapping_dict = fileMapping_information.returnValue
+    public: fileMapping_information.fileMapping_dict = fileMapping_information.public
+    information: fileMapping_information.fileMapping_dict = fileMapping_information.information
+    logs: fileMapping_information.fileMapping_dict = fileMapping_information.logs
+
+    # callObject = fileMapping_dict({})
+    # invoke = fileMapping_dict({})
+    # returnValue = fileMapping_dict({})
+    # public = fileMapping_dict({})
+    # information = fileMapping_dict({})
+    # logs = fileMapping_dict({"run": 1})
     path = None
 
     def __init__(self,
@@ -86,8 +93,8 @@ class File:
             raise FileNotFoundError(f"不是一个有效的绝对路径。: '{absolutePath}'")
 
         # 加载配置文件
-        self.public["config"] = helperFunctions.deep_update(helperFunctions.configConvertTodict(information.config), config) \
-            if config else helperFunctions.configConvertTodict(information.config)
+        self.public["config"] = helperFunctions.deep_update(helperFunctions.configConvertTodict(fileMapping_information.config), config) \
+            if config else helperFunctions.configConvertTodict(fileMapping_information.config)
 
         self.printLog = printLog
         self.printPosition = printPosition

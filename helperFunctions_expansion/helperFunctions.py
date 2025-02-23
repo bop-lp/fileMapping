@@ -8,6 +8,7 @@ import os
 import sys
 import inspect as inspectKB
 
+from ..information import information
 from ..information import fileMappingConfig
 
 from . import empty
@@ -119,3 +120,18 @@ else:
 
     def sort(original_dict):
         return OrderedDict(sorted(original_dict.items()))
+
+
+def getAppRegister(name: str, return_value = None) -> object | None:
+    """
+    获取注册的应用
+    :param name: 应用名称
+    :return: 应用注册 object
+    """
+    _ = information.appRegister.get(name)
+    if _ is None:
+        return return_value
+
+    return _
+
+

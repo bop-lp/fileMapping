@@ -55,7 +55,7 @@ def theRunFileWasSuccessful(s1):
 
 def theRunFileFailed(s1, s2):
     return printlog(**{
-        "log": f"运行文件失败: {s1} 文件\n\tlog: {s2}",
+        "log": f"[00]运行文件失败: {s1} 文件\n\tlog: {s2}",
         "printPosition":cg.log["printPosition"],
         "color": "31",
         "printLog": cg.log["printLog"]

@@ -1,9 +1,31 @@
-[TOC]
+<!-- TOC -->
+* [`fileMapping`](#filemapping)
+  * [当前版本 0.3.16](#当前版本-0316)
+  * [安装](#安装)
+  * [环境要求](#环境要求)
+* [如何使用?](#如何使用)
+  * [示例代码](#示例代码-)
+    * [文件结构树](#文件结构树)
+    * [`config.py`](#configpy)
+    * [`config.json`](#configjson)
+    * [`C\\config.py`](#cconfigpy)
+  * [------](#------)
+    * [`main.py`](#mainpy)
+    * [`a.py`](#apy)
+    * [`b.py`](#bpy)
+    * [`C\\__init__.py`](#cinitpy)
+    * [`C\\api.py`](#capipy)
+  * [函数介绍](#函数介绍)
+    * [`fileMapping.File`](#filemappingfile)
+    * [`fileMapping.pathConversion`](#filemappingpathconversion)
+    * [`fileMapping.configConvertTodict`](#filemappingconfigconverttodict)
+  * [更新日志](#更新日志)
+<!-- TOC -->
 
 ------
 
 # `fileMapping`
-## 当前版本 0.3.15
+## 当前版本 0.3.16
 用于快速调用文件夹下的py文件或者包
 
 

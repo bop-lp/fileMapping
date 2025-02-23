@@ -224,3 +224,10 @@ def fileOperations(path: str, mode: str, *args, **kwargs) -> _io.open:
 
     - 用于对文件进行操作
     """
+
+
+def getAppRegister(name: str) -> object:
+    """
+    返回一个插件的 register 实例
+    :param app: 插件 注册在名称
+    """

@@ -8,7 +8,7 @@ import functools
 import time
 
 # import rich
-
+from . information import information
 from .helperFunctions_expansion import helperFunctions as hF
 from .helperFunctions_expansion import informationProcessing as iP
 
@@ -57,6 +57,21 @@ def secondsTask(seconds: int = 1, timeout: bool | int = False, __level__: int = 
         - 超过这个时间后 任务会停止
     :param __level__: 运行等级
     """
+
+
+
+def appRegister(func, name: str = None):
+    """
+    这是一个装饰器，用于注册插件
+    注册后会保存到 fileMapping.information.appRegister 字典中
+    -> {name: Register object}
+
+    :param func: 注册函数
+    :param name: 注册名称
+    """
+    information["appRegister"][name if not name is None else func.__name__] = func
+
+    return func
 
 
 """
@@ -165,3 +180,41 @@ class InfoWrapper:
             return result
 
         return wrapper
+
+
+def threadRegistration(separate: bool = False, mainThread: bool = False, timingOfOperation: int = 1,
+                       __level__: int = -1, **kwargs):
+    """
+    - 只会运行一次
+
+    :param separate: 是否分开运行
+        - 是否分开运行, 即是否在单独的线程中运行
+        - 运行效率慢
+
+    :param mainThread: 是否在主线程中运行
+        - 一般的运行会在线程池中抽出线程来进行执行
+
+    :param timingOfOperation: 运行时机
+        # -1: __function__(main) 运行之前
+        # - 0: __function__(main) 运行之后
+        - 1: 当所有插件都 __function__(main) 运行完毕之后
+
+    :param __level__: 运行等级
+        - 何时有用？
+        - 当 timingOfOperation = 1 时
+        - 会进行排序，然后进行异步执行
+
+    :param kwargs: 其他参数
+        - 其他参数会被传递给 func 函数
+    """
+    def wrapper(func):
+        information["readRegistration"][func] = {
+            "separate": separate,
+            "mainThread": mainThread,
+            "timingOfOperation": timingOfOperation,
+            "level": __level__,
+            "kwargs": kwargs
+        }
+        return func
+
+    return wrapper
