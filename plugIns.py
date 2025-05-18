@@ -1,36 +1,23 @@
-import _io
 import os
 import sys
-import atexit
-import time
-import types
+from collections import ChainMap
 
-# try:
-#     from rich import inspect
-#     import rich
-#     # 这里是测试时用的, 实际上应该注释掉
-
-# except ImportError:
-#     pass
-
-from . import information as fileMapping_information
+from . import information as f_information
 from .helperFunctions_expansion import helperFunctions
-from .helperFunctions_expansion.helperFunctions import fileMapping_dict
 from .helperFunctions_expansion import multithreading
 
 from .information import error as file_error
 from . import helperFunctions_expansion
 from .multithreading_fileMapping import fileMapping_func
 from . import pluginLoading
-from .information import fileMappingConfig as fileMappingConfig
+from .information import fileMappingConfig
 from . import string
 from . import register
 
-Application: fileMapping_information.fileMapping_dict = fileMapping_information.Application
-# Application = fileMapping_dict({})
+Application: f_information.FilemappingDict = f_information.application
 
 
-class File:
+class File(f_information.File):
     """
     callObject
         - 调用对象
@@ -45,19 +32,13 @@ class File:
     logs
         - 日志
     """
-    callObject: fileMapping_information.fileMapping_dict = fileMapping_information.callObject
-    invoke: fileMapping_information.fileMapping_dict = fileMapping_information.invoke
-    returnValue: fileMapping_information.fileMapping_dict = fileMapping_information.returnValue
-    public: fileMapping_information.fileMapping_dict = fileMapping_information.public
-    information: fileMapping_information.fileMapping_dict = fileMapping_information.information
-    logs: fileMapping_information.fileMapping_dict = fileMapping_information.logs
+    callObject = f_information.callObject
+    invoke = f_information.invoke
+    returnValue = f_information.returnValue
+    public = f_information.public
+    information = f_information.information
+    logs = f_information.logs
 
-    # callObject = fileMapping_dict({})
-    # invoke = fileMapping_dict({})
-    # returnValue = fileMapping_dict({})
-    # public = fileMapping_dict({})
-    # information = fileMapping_dict({})
-    # logs = fileMapping_dict({"run": 1})
     path = None
 
     def __init__(self,
@@ -65,8 +46,8 @@ class File:
                  screening=None,
                  config: dict = None,
                  printLog: bool = False,
-                 printPosition = sys.stdout
-        ):
+                 printPosition=sys.stdout
+                 ):
         """
         映射文件夹下的Python文件或者包
         :param absolutePath: 当前的根目录绝对路径
@@ -87,32 +68,33 @@ class File:
             - 多线程 & 异步
         """
         if screening is None:
+            # 目前只支持py, 这里是为了以后做铺垫
             screening = ["py"]
 
-        if not ((not os.path.isabs(absolutePath)) or (not os.path.islink(absolutePath))):
+        if self.__pathValidation__(absolutePath if isinstance(absolutePath, (list, tuple)) else [absolutePath]):
             raise FileNotFoundError(f"不是一个有效的绝对路径。: '{absolutePath}'")
 
+        if isinstance(absolutePath, str):
+            # 为了兼容 File 多个路径
+            absolutePath = [absolutePath]
+
         # 加载配置文件
-        self.public["config"] = helperFunctions.deep_update(helperFunctions.configConvertTodict(fileMapping_information.config), config) \
-            if config else helperFunctions.configConvertTodict(fileMapping_information.config)
+        self.public["config"] = helperFunctions.deep_update(helperFunctions.configConvertTodict(f_information.config),
+                                                            config) \
+            if config else helperFunctions.configConvertTodict(f_information.config)
 
         self.printLog = printLog
         self.printPosition = printPosition
         self.path = absolutePath
+        self.lordPath = absolutePath[0]
+        # self.lordPath = absolutePath[0] if isinstance(absolutePath, list) else absolutePath
 
         self.run_order = {}
         self.listOfFiles = {}
         fileMappingConfig.log['printPosition'] = self.printPosition
         fileMappingConfig.log['printLog'] = self.printLog
-        self.listOfFiles = {
-            i.split('.')[0]: os.path.join(absolutePath, i)
-            if os.path.isfile(os.path.join(absolutePath, i)) and i.split('.')[-1] in screening
-            else os.path.join(absolutePath, i, fileMappingConfig.functionsName["__init__.py"])
-            for i in os.listdir(absolutePath)
-            if(os.path.isfile(os.path.join(absolutePath, i)))
-            or(os.path.isdir(os.path.join(absolutePath, i))
-            and os.path.isfile(os.path.join(absolutePath, i, fileMappingConfig.functionsName["__init__.py"])))
-        }
+        self.listOfFiles = self.__dictMerge__(*[self.__fileFiltering__(i, screening) for i in absolutePath])
+        # self.listOfFiles = self.__fileFiltering__(absolutePath, screening)
         if self.public.config.get('multithreading', False):
             self.multithreading = multithreading.enableMultithreading(
                 self.public['config']['numberOfThreads']
@@ -122,7 +104,7 @@ class File:
         else:
             self.__singleThreaded__()
         # 使用应用参数
-        Application["end"] = helperFunctions_expansion.parameterApplication.ApplyParameter(self)
+        helperFunctions_expansion.parameterApplication.ApplyParameter(self)
 
     def __run__(self, name, kwargs):
         """
@@ -176,6 +158,39 @@ class File:
             else:
                 string.errorNoFile(name)
 
+    def __dictMerge__(self, *args: list[dict]) -> dict:
+        """
+        多个dict合并
+        :param args: dict
+        """
+        return dict(ChainMap(*reversed(args)))  # 需要反转参数顺序
+
+    def __fileFiltering__(self, cpath, screening):
+        """
+        文件筛选
+        :param cpath: 路径
+        :param screening: 文件
+        """
+        return {
+            i.split('.')[0]: os.path.join(cpath, i)
+            if os.path.isfile(os.path.join(cpath, i)) and i.split('.')[-1] in screening
+            else os.path.join(cpath, i, fileMappingConfig.functionsName["__init__.py"])
+            for i in os.listdir(cpath)
+            if (os.path.isfile(os.path.join(cpath, i)))
+               or (os.path.isdir(os.path.join(cpath, i))
+                   and os.path.isfile(os.path.join(cpath, i, fileMappingConfig.functionsName["__init__.py"])))
+        }
+
+    def __pathValidation__(self, pathLit: list) -> bool:
+        """
+        路径验证
+        :param pathLit: 路径 list
+        """
+        return False in [
+            (os.path.isabs(i) or os.path.exists(i))
+            for i in pathLit
+        ]
+
     def __multithreading__(self):
         """
         多线程运行
@@ -193,7 +208,6 @@ class File:
                                                     wrapper_list=[time_wrapper.wrapper, info_wrapper.wrapper])
                 self.callObject |= dict(zip(L, data))
                 self.invoke |= dict(zip(L, [i.pack for i in data]))
-                # TypeError（“'NoneType' 对象不可下标”）
 
             else:
                 # 获取 时间 & 信息 -> information.run_time & file_info
@@ -223,7 +237,8 @@ class File:
             for __level__, L in self.run_order.items():
                 for name in L:
                     pluginLoading.f.__name__ = name
-                    self.callObject[name] = info_wrapper.wrapper(time_wrapper.wrapper(pluginLoading.f))(self.listOfFiles[name])
+                    self.callObject[name] = info_wrapper.wrapper(time_wrapper.wrapper(pluginLoading.f))(
+                        self.listOfFiles[name])
                     self.invoke[name] = self.callObject[name].pack
 
             else:
@@ -235,80 +250,3 @@ class File:
         else:
             file_error.circularDependenciesError(self.logs, self.run_order)
             return False
-
-
-@atexit.register
-def end():
-    """
-    结束插件运行
-    :return:
-    """
-    if not fileMappingConfig.endTheTask:
-        return
-
-    for key, value in File.invoke.items():
-        if fileMappingConfig.functionsName["__end__"] in dir(value):
-            name = getattr(value, fileMappingConfig.functionsName["__end__"])
-            if isinstance(name, types.FunctionType):
-                try:
-                    name()
-
-                except fileMappingConfig.error_list_a2 as e:
-                    string.endFailed(key, e)
-
-                continue
-
-            if not name in dir(value):
-                string.endfunctionNotFound(key, name)
-                continue
-
-            pointer = getattr(value, name)
-            try:
-                pointer()
-                continue
-
-            except fileMappingConfig.error_list_a2 as e:
-                string.endFailed(key, e)
-
-
-@atexit.register
-def fileMapping_end():
-    """
-    结束
-    :return:
-    """
-    for i in Application.get("end", []):
-        try:
-            i()
-
-        except Exception as e:
-            pass
-
-
-def temporaryFolders(name: str, *args) -> str | bool:
-    """
-    临时文件夹
-    :return:
-    """
-    if name in File.information.temporaryFolders:
-        if args is None:
-            return File.information.temporaryFolders[name]
-
-        else:
-            return os.path.join(File.information.temporaryFolders[name], *args)
-
-    else:
-        return False
-
-
-def fileOperations(path: str, *args, **kwargs) -> _io.open:
-    """
-    文件操作
-    :return:
-    """
-    try:
-        file = open(path, *args, **kwargs)
-        return file
-
-    except Exception as e:
-        return False

@@ -11,6 +11,9 @@
 这里的用户, 不是指开发者, 而是指使用者, 也就是最终用户
 """
 
+# rootPath: str = os.path.dirname(os.path.dirname(__file__))
+rootPath: str
+# 项目的根目录
 # 以下是一些 fileMapping 的变量
 multithreading: bool = True
 # 是否开启多线程
@@ -20,10 +23,11 @@ tick: int = 2
 # 每秒运行多少次
 # 合理的 tick 值 2 - 5
 
-temporaryFolders: str = "temp"
+temporaryFolders: str | bool = "temp"
 # 临时文件夹的名称
-dataFolder: str = "file_DATA"
+dataFolder: str | bool = "file_DATA"
 # 数据文件夹的名称
+# temporaryFolders & dataFolder 是否为 False 时, 则不会创建文件夹
 
 logFolder: str = "log"
 # 日志文件夹的名称

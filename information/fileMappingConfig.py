@@ -20,6 +20,9 @@ functionsName = {
     "__temporaryFolders__": "__temporaryFolders__",
     "__error__": "__error__",
     "__underlying__": "__underlying__"
+} | {
+    # 0.3.19 新增参数
+    "__dataFolders__": "__dataFolders__"
 }
 
 functions = {
@@ -35,7 +38,8 @@ functions = {
     "__dependenciesOnPlugins__": [],
     "__temporaryFolders__": None,
     "__error__": None,
-    "__underlying__": False
+    "__underlying__": False,
+    "__dataFolders__": None
 }
 """
 __level__

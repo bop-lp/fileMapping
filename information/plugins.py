@@ -77,6 +77,17 @@ __temporaryFolders__ = str | list
 # fileMapping.temporaryFolders() 会返回申请的临时文件夹路径
 # 无法动态申请
 
+__dataFolders__ = str | list
+# 参数名称: 数据文件夹
+# 是否必须: 否
+# 加入版本: 0.3.19
+# 类型: str | list
+# 默认值: None
+# 描述: 用于申请一个数据文件夹
+# fileMapping 会在init时申请一个数据文件夹, 并在插件结束时删除
+# fileMapping.dataFolders() 会返回申请的临时文件夹路径
+# 无法动态申请
+
 
 __error__ = object
 # 参数名称: 错误处理函数
@@ -208,6 +219,19 @@ class Plugin:
 def temporaryFolders(path: str = None, *args) -> str:
     """
     返回申请的临时文件夹路径
+
+    :param path: 插件申请的临时文件路径
+        - 会验证该路径
+        - None: 直接返回临时文件路径
+
+    :param args:
+        - 做拼接, 不会验证路径的真实性
+    """
+
+
+def dataFolders(path: str = None, *args):
+    """
+    返回一个数据文件夹路径
 
     :param path: 插件申请的临时文件路径
         - 会验证该路径

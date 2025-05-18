@@ -10,15 +10,14 @@ from . import multithreading_fileMapping
 
 from . import server
 
-
 # File: plugIns.File = plugIns.File
 # pathConversion: plugIns.pathConversion = plugIns.pathConversion
 from .plugIns import temporaryFolders
 
-
 #####
 # 快捷导入
-from . register import appRegister
-from . helperFunctions_expansion.helperFunctions import getAppRegister
+from .register import appRegister
+from .helperFunctions_expansion.helperFunctions import getAppRegister
 
-
+from . import method
+# 这个是 fileMapping
