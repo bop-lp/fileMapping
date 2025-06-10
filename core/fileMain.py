@@ -49,6 +49,9 @@ class File(data.File):
         else:
             self.plugInRunData = __singleThreaded__(listOfFiles)
 
+        for i in self.plugInRunData.moduleAbnormal:
+            print(i.stack)
+
 
 def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: dict) -> Class.PlugInRunData:
     """
@@ -70,8 +73,15 @@ def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: 
             # callObject |= dict(zip(L, data))
             # invoke |= dict(zip(L, [i.pack for i in data]))
             # 以上是 python3.9 才支持的语法
-            plugInData.callObject.update(dict(zip(L, data)))
-            plugInData.invoke.update(dict(zip(L, [i.pack for i in data])))
+            moduleData = [
+                i for i in data if isinstance(i, Class.Module)
+            ]
+            plugInData.moduleAbnormal += [
+                i for i in data if not isinstance(i, Class.Module)
+            ]
+
+            plugInData.callObject.update(dict(zip(L, moduleData)))
+            plugInData.invoke.update(dict(zip(L, [i.pack for i in moduleData])))
 
         else:
             # 获取 时间 & 信息 -> information.run_time & file_info

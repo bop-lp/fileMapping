@@ -1,5 +1,7 @@
 #######################
 # 以下为快捷导入
+import os
+
 from .core import File
 from .core import pathConversion
 # from .core import parameterApplication
@@ -23,6 +25,14 @@ from .core import wordProcessing
 # 文字处理模块
 
 
+# 加载fileMapping的内置插件
+if not __name__ == '__main__':
+    # print(pathConversion(__file__, "builtInPlugins"))
+    # print(os.path.dirname(__file__), os.path.abspath("builtInPlugins"))
+    _f = File(pathConversion(__file__, "builtInPlugins"), {})
+
+    pass
 __all__ = [
     *core.__all__
 ]
+

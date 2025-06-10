@@ -127,7 +127,12 @@ multithreading: bool = True
 numberOfThreads: int = 4
 # 线程数 - 合理的线程数 4 - 6
 
+endTask: bool = True
+# 是否执行结束任务
 
+
+__builtInPlugins = 'builtInPlugins'
+# 内置插件的目录名
 
 __all__ = [
     "functionsName",

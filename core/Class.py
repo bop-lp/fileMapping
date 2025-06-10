@@ -95,6 +95,7 @@ class ConfigData(FilemappingDict):
     screening: Tuple[str]
     multithreading: bool
     numberOfThreads: int
+    endTask: bool
 
 
 # 以上是数据类
@@ -291,6 +292,7 @@ class PlugInRunData(PlugIns):
     callObject: CallObject = CallObject
     invoke: Invoke = Invoke
     information: Information = Information
+    moduleAbnormal: List[abnormal.Mistake] = []
 
     def __init__(self, callObject: Union[CallObject, dict], invoke: Union[Invoke, dict],
                  information: Union[Information, dict]):
@@ -302,6 +304,7 @@ class PlugInRunData(PlugIns):
         # 这里是插件 invoke 类 保存插件 python.Module 类
         self.information = Information(information)
         # 这里是插件 information 类 保存插件 插件信息和运行时间 类
+        self.moduleAbnormal: List[abnormal.Mistake] = []
 
 
 class ReturnValue(FilemappingDict): ...

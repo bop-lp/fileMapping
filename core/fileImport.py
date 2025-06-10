@@ -17,14 +17,13 @@ from . import helperFunctions
 class Module(Class.Module):
     def __init__(self, path: str):
         """
-        111
         :param path: 这个是绝对路径
         """
         super().__init__(path)
 
         self.pointer = None
         self.path = path
-        self.absolutePath = self.path if os.path.isabs(self.path) == True else os.path.realpath(self.path)
+        self.absolutePath = os.path.dirname(path)
         self.packageName = os.path.basename(path)
 
         self.__import__()
@@ -35,9 +34,9 @@ class Module(Class.Module):
             self.path = os.path.dirname(self.path)
             # 去除后文件名字
 
-        self.pack = py_import(self.path, self.packageName)
+        self.pack = py_import(self.absolutePath, self.packageName)
 
-        rich.print(dir(self.pack))
+        # rich.print(dir(self.pack))
         if isinstance(self.pack, abnormal.PackageImport):
             raise self.pack
 
@@ -63,7 +62,8 @@ def f(path: str) -> Union[Class.Module, bool]:
     :param path:
     """
     if path.endswith('__init__.py'):
-        return Module(os.path.dirname(path))
+        path = os.path.dirname(path)
+        return Module(path)
 
     else:
         return Module(path)
@@ -72,8 +72,8 @@ def f(path: str) -> Union[Class.Module, bool]:
 
 def py_import(file_path: os.path, callObject: str) -> Union[ModuleType, abnormal.PackageImport]:
     """
-    :param callObject: 'main'
     :param file_path: 绝对路径
+    :param callObject: 'main'
     :return:
 
     """

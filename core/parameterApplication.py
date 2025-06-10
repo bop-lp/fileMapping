@@ -252,23 +252,6 @@ class ReadRegistration(Class.ParameterApplication):
                     self.self_info.logs['readRegistration']['error'].append({func: e})
 
 
-@wrapper
-class Config(Class.ParameterApplication):
-    def __init__(self, self_info: Class.File):
-        """
-        终于解决每个插件，之间的配置问题
-        运行时会插件的配置和用户的配置深度合成,并放入File.config到
-        :param self_info: 初始化信息 -> fileMapping.File
-        """
-        super().__init__(self_info)
-
-        self.self_info = self_info
-        self.logs = self_info.logs["config"] = {"error": []}
-
-    def init(self):
-        for key, value in self.self_info.information.items():
-            pass
-
 
 @wrapper
 class End(Class.ParameterApplication):
@@ -288,22 +271,24 @@ class End(Class.ParameterApplication):
                 "run": True
             }
 
-        except Class.FileMappingConfig.error_list_a2 as e:
+        except Exception as e:
+            self.self_info.logData.parameterApplication.append(abnormal.pluginEndError(
+                func.__name__, e, traceback.format_exc()
+            ))
             return {
-                "run": False,
-                "error": e,
-                "traceback": traceback.format_exc()
+                "run": False
             }
 
     def end(self):
-        if not Class.FileMappingConfig.endTheTask:
+        if not self.self_info.config.endTask:
+            # 结束任务关闭
             return
 
-        for key, value in self.self_info.invoke.items():
-            if not Class.FileMappingConfig.functionsName["__end__"] in dir(value):
+        for key, value in self.self_info.plugInRunData.invoke.items():
+            if not self.self_info.config.functionsName["__end__"] in dir(value):
                 continue
 
-            pointer = getattr(value, Class.FileMappingConfig.functionsName["__end__"])
+            pointer = getattr(value, self.self_info.config.functionsName["__end__"])
             if isinstance(pointer, str) and (pointer in dir(value)):
                 pointer = getattr(value, pointer)
 
@@ -313,11 +298,5 @@ class End(Class.ParameterApplication):
             else:
                 continue
 
-            data = self.run(pointer)
-            if data["run"]:
-                self.self_info.logs.fileMappingOutput(
-                    information.error.EndOfPlugin(
-                        key, pointer.__name__, data["error"], data["traceback"]
-                    )
-                )
+            self.run(pointer)
 

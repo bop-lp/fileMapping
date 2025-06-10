@@ -90,6 +90,22 @@ class PluginLoopsDependencies(PlugIns):
         return f"插件循环依赖错误 '{self.plugInLoops}'"
 
 
+class pluginEndError(PlugIns):
+    error: str
+    stack: str
+    def __init__(self, nameOfThePlugin: str, error: str, stack: str):
+        super().__init__(nameOfThePlugin)
+
+        self.stack = stack
+        self.error = error
+
+    def english(self) -> str:
+        return f"Plugin end error '{self.nameOfThePlugin}' Error: '{self.error}'"
+
+    def chinese(self) -> str:
+        return f"插件结束 '{self.stack}' error:'{self.error}'"
+
+
 class ParameterApplication(Mistake):
     ApplicationName: str
     error: str

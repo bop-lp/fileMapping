@@ -117,6 +117,20 @@ def functionRegistrations(name: str = None):
 
 
 
+# parameterApplication 的装饰器
+def appRegistration(name: str=None):
+    """
+    参数应用装饰器
+    将数据放入 data.plugInData.parameterApplication 中
+    然后由 parameterApplication.py 的函数进行处理
+    """
+    def func_wrapper(func: Class.ParameterApplication) -> Class.ParameterApplication:
+        data.plugInData.parameterApplication[func.__name__ if name is None else name] = func
+
+        return func
+    return func_wrapper
+
+
 __all__ = [
     "parameters_wrapper",
     "wrapper_recursion",

@@ -7,7 +7,7 @@ from . import Class
 
 class PluginData(Class.PlugInData):
     # 这里是插件数据
-    pass
+    parameterApplication: Dict[str, Class.ParameterApplication] = {}
 
 
 
@@ -15,19 +15,19 @@ class LogData(Class.LogData): ...
 
 
 
-class ConfigData(Class.ConfigData):
-    functionsName: Dict[str, str]
-    functions: Dict[str, str]
-    functions_bad: Dict[str, str]
-    # 这里fileMapping的配置数据
-    error_list_a1: Tuple[ModuleNotFoundError, TypeError, ImportError, FileNotFoundError, ModuleNotFoundError]
-    error_list_a2: Tuple[TypeError, Exception]
-    error_all: Tuple[EOFError]
-    # error 可能用不到
-    config_type_tuple: Tuple[dict, list, tuple]
-    screening: Tuple[str]
-    multithreading: bool = True
-    numberOfThreads: int = 4
+class ConfigData(Class.ConfigData): ...
+    # functionsName: Dict[str, str]
+    # functions: Dict[str, str]
+    # functions_bad: Dict[str, str]
+    # # 这里fileMapping的配置数据
+    # error_list_a1: Tuple[ModuleNotFoundError, TypeError, ImportError, FileNotFoundError, ModuleNotFoundError]
+    # error_list_a2: Tuple[TypeError, Exception]
+    # error_all: Tuple[EOFError]
+    # # error 可能用不到
+    # config_type_tuple: Tuple[dict, list, tuple]
+    # screening: Tuple[str]
+    # multithreading: bool = True
+    # numberOfThreads: int = 4
 
 
 # 这里是返回值数据

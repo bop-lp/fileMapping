@@ -26,7 +26,7 @@ def pathConversion(cpath: os.path, path: os.path) -> os.path:
     :param path: 必须为文件夹
     :return:
     """
-    return os.path.join(os.path.dirname(cpath)if os.path.isfile(cpath)else cpath, os.path.abspath(path))
+    return os.path.join(os.path.dirname(cpath)if os.path.isfile(cpath)else cpath, path)
 
 
 
