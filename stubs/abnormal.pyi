@@ -1,0 +1,79 @@
+# fileMapping/core/abnormal.pyi
+# abnormal 异常类声明
+
+from typing import List, Any, Union
+
+class Mistake(Exception):
+    listOfLanguages: List[Any]
+    stack: str
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class Package(Mistake):
+    stack: str
+    packageName: str
+
+    def __init__(self, stack: str, packageName: str) -> None: ...
+
+
+class PackageImport(Package):
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class PackageRun(Package):
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class PlugIns(Mistake):
+    nameOfThePlugin: str
+
+    def __init__(self, nameOfThePlugin: str) -> None: ...
+
+
+class PluginDependencies(PlugIns):
+    dependenciesOnPlugins: str
+
+    def __init__(self, nameOfThePlugin: str, dependenciesOnPlugins: str) -> None: ...
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class PluginLoopsDependencies(PlugIns):
+    plugInLoops: Union[list, tuple]
+
+    def __init__(self, plugInLoops: Union[list, tuple]) -> None: ...
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class ParameterApplication(Mistake):
+    ApplicationName: str
+    error: str
+    stack: str
+
+    def __init__(self, ApplicationName: str, error: str, stack: str) -> None: ...
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class ParameterApplicationRun(ParameterApplication):
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class ParameterApplicationEnd(ParameterApplication):
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+class ParameterApplicationInit(ParameterApplication):
+    def english(self) -> str: ...
+    def chinese(self) -> str: ...
+
+
+

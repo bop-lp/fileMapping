@@ -126,3 +126,20 @@ multithreading: bool = True
 # 是否开启多线程
 numberOfThreads: int = 4
 # 线程数 - 合理的线程数 4 - 6
+
+
+
+__all__ = [
+    "functionsName",
+    "functions",
+    "functions_bad",
+    "saveThePath",
+    "error_list_a1",
+    "error_list_a2",
+    "error_all",
+    "config_type_tuple",
+    "screening",
+    "path",
+    "multithreading",
+    "numberOfThreads",
+]

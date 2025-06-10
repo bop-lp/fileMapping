@@ -1,137 +1,42 @@
-from .Class import ParameterApplication
+
+
+from . import abnormal
+# abnormal 模块 异常处理模块
+
+from . import Class
+
+from . import config
+
+from . import decorators
+# fileMapping.decorators 装饰器模块
+
+from . import fileImport
+
+from . import helperFunctions
+# helperFunctions 辅助函数模块
+
+from . import multithreading
+from . import multiThreadedHelperFunctions
+
+from . import parameterApplication
+#
+
+from . import wordProcessing
+# 文字处理模块
+
+
+# from .Class import ParameterApplication
+from .helperFunctions import pathConversion
 from .fileMain import File
+# 快速导入类和函数
 
-
-# decorators.py
-from .decorators import (
-    parameters_wrapper,
-    wrapper_recursion,
-    my_wraps,
-    functionRegistrations,
-    TimeWrapper,
-    InfoWrapper
-)
-
-
-from .helperFunctions import  (
-    pathValidation,
-    pathConversion,
-    dictMerge,
-    configConvertTodict,
-    parameterFilling,
-    sort,
-    deep_update
-)
-
-from .config import (
-    functionsName,
-    functions,
-    functions_bad,
-    saveThePath,
-    error_list_a1,
-    error_list_a2,
-    error_all,
-    config_type_tuple,
-    screening,
-    path,
-    multithreading,
-    numberOfThreads
-)
-
-from .data import (
-    logData,
-    plugInData,
-    configData,
-    returnValue,
-)
-
-from .multithreading import (
-    task_run,
-    task_recursion,
-    task_run_clogging,
-    task_recursion_clogging,
-    threadPools,
-    EnableMultithreading
-)
-
-from .multiThreadedHelperFunctions import (
-    _task,
-    file_read,
-    text_parsing,
-    file_import
-)
-
-
-decorators_list = [
-    "parameters_wrapper",
-    "wrapper_recursion",
-    "my_wraps",
-    "functionRegistrations",
-    "TimeWrapper",
-    "InfoWrapper",
-]
-
-
-helperFunctions_list = [
-    "pathValidation",
-    "pathConversion",
-    "dictMerge",
-    "configConvertTodict",
-    "parameterFilling",
-    "sort",
-    "deep_update",
-]
-
-
-config_list = [
-    "functionsName",
-    "functions",
-    "functions_bad",
-    "saveThePath",
-    "error_list_a1",
-    "error_list_a2",
-    "error_all",
-    "config_type_tuple",
-    "screening",
-    "path",
-    "multithreading",
-    "numberOfThreads",
-]
-
-
-data_list = [
-    "logData",
-    "plugInData",
-    "configData",
-    "returnValue",
-    "File",
-]
-
-
-multithreading_list = [
-    "task_run",
-    "task_recursion",
-    "task_run_clogging",
-    "task_recursion_clogging",
-    "threadPools",
-    "EnableMultithreading",
-]
-
-
-multiThreadedHelperFunctions_list = [
-    "_task",
-    "file_read",
-    "text_parsing",
-    "file_import",
-]
 
 
 __all__ = [
-    "ParameterApplication",
-    *decorators_list,
-    *helperFunctions_list,
-    *config_list,
-    *data_list,
-    *multithreading_list,
+    *decorators.__all__,
+    *helperFunctions.__all__,
+    *config.__all__,
+    *multithreading.__all__,
+    *multiThreadedHelperFunctions.__all__
 ]
 

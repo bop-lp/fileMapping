@@ -1,0 +1,16 @@
+import os
+from types import ModuleType
+from typing import Any, Union
+
+from . import Class
+from . import abnormal
+
+
+class Module(Class.Module):
+    def __init__(self, path: str) -> None: ...
+    def __import__(self) -> None: ...
+    def run(self, **kwargs) -> Any: ...
+
+def f(path: str) -> Union[Class.Module, bool]: ...
+
+def py_import(file_path: os.PathLike, callObject: str) -> Union[ModuleType, abnormal.PackageImport]: ...
