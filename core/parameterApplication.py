@@ -124,17 +124,16 @@ class Init(Class.ParameterApplication):
             pack = self.self_info.plugInRunData.callObject[key].pack
             # pointer 是函数的存放地
             # pack 是插件的包
-
-            if value['__init__'] in [None, False, '']:
-                continue
-
-            if not value['__init__'] in dir(pack):
+            if value['__init__'] in dir(pack):
                 _ = value['__init__']
 
-            elif not "main" in dir(pack):
+            elif "main" in dir(pack):
                 _ = "main"
 
             else:
+                continue
+
+            if not isinstance(_, str):
                 continue
 
             pointer = getattr(pack, _)

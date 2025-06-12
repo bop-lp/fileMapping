@@ -31,7 +31,7 @@ if not __name__ == '__main__':
     # print(os.path.dirname(__file__), os.path.abspath("builtInPlugins"))
     _f = File(pathConversion(__file__, "builtInPlugins"), {})
 
-    pass
+
 __all__ = [
     *core.__all__
 ]

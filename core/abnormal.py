@@ -44,11 +44,16 @@ class PackageImport(Package):
 
 
 class PackageRun(Package):
+    def __init__(self, stack: str, packageName: str, error: str):
+        super().__init__(stack, packageName)
+
+        self.error = error
+
     def english(self) -> str:
-        return f"The package is running incorrectly {self.packageName}"
+        return f"The package is running incorrectly {self.packageName} Error {self.error}"
 
     def chinese(self) -> str:
-        return f"包运行错误 {self.packageName}"
+        return f"包运行错误 {self.packageName} Error {self.error}"
 
 
 class PlugIns(Mistake):

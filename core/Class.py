@@ -131,7 +131,7 @@ class Module:
     def __init__(self, path: str):
         self.path = path
 
-    def run(self, **kwargs: Any) -> Any: ...
+    def run(self, **kwargs: Any) -> Union[Any, abnormal.PackageRun]: ...
 
     def __import__(self): ...
 
@@ -166,7 +166,12 @@ class PluginTimestamp(PlugIns):
     # 插件结束时间戳
     take: float
     # end - init 得到插件运行时间
+    def __init__(self, init: float, end: float, take: float=None):
+        super().__init__()
 
+        self.init = init
+        self.end = end
+        self.take = take if take else end - init
 
 # TimeWrapperDataType: TypeAlias = Dict[Any, PluginTimestamp]
 timeWrapperData = TypeVar("timeWrapperData", bound="PluginTimestamp")

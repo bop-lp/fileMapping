@@ -1,14 +1,14 @@
 import os
 import shutil
 import traceback
-from typing import Dict
+from typing import Dict, Union
 
 from fileMapping.core import Class
 
 from . import abnormal
 
 
-def mkdir(file_path) -> bool | abnormal.FolderCreationFailed:
+def mkdir(file_path) -> Union[bool, abnormal.FolderCreationFailed]:
     try:
         # os.makedirs()
         os.makedirs(file_path)
@@ -45,7 +45,7 @@ def statistics(filePath: str, file_info: Dict[str, Class.PlugInRetention]) -> Di
     return createDict
 
 
-def delete(path: str) -> bool | abnormal.FolderDeletion:
+def delete(path: str) -> Union[bool, abnormal.FolderDeletion]:
     try:
         shutil.rmtree(path)
         return True

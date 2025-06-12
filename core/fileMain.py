@@ -1,11 +1,9 @@
-from typing import Union, Tuple, Dict
-
-import rich
+from typing import Union
 
 from . import data, abnormal
 from . import Class
 from . import helperFunctions
-from . import config as Config
+from . import config as file_config
 from . import decorators
 
 from . import multithreading
@@ -32,10 +30,10 @@ class File(data.File):
         if helperFunctions.pathValidation(path if isinstance(path, (list, tuple)) else [path]):
             raise FileNotFoundError(f"不是一个有效的绝对路径。: '{path}'")
 
-        _ = [helperFunctions.__fileFiltering__(i, Config.screening) for i in path]
+        _ = [helperFunctions.__fileFiltering__(i, file_config.screening) for i in path]
         listOfFiles = helperFunctions.dictMerge(*_)
-        config = helperFunctions.deep_update(helperFunctions.configConvertTodict(Config),config) \
-            if config else helperFunctions.configConvertTodict(Config)
+        config = helperFunctions.deep_update(helperFunctions.configConvertTodict(file_config), config) \
+            if config else helperFunctions.configConvertTodict(file_config)
 
         data.configData = data.ConfigData(config)
         self.config = data.configData
@@ -51,8 +49,35 @@ class File(data.File):
             self.plugInRunData = __singleThreaded__(listOfFiles)
 
         parameterApplication.ApplyParameter(self)
-        # for i in self.plugInRunData.moduleAbnormal:
-        #     print(i.stack)
+
+    def runOne(self, nameOfThePlugin: str, **kwargs):
+        """
+        运行特定的插件
+        :param nameOfThePlugin: 插件名字
+        :param kwargs: 运行参数
+        :return:
+        """
+        if nameOfThePlugin in self.plugInRunData.callObject:
+            self._run_(nameOfThePlugin, self.plugInRunData.callObject[nameOfThePlugin], **kwargs)
+
+    def runAll(self, **kwargs):
+        """
+        运行所有插件
+        :param kwargs: 运行参数
+        :return:
+        """
+        for key, value in self.plugInRunData.callObject.items():
+            self._run_(key, value, **kwargs)
+
+    def _run_(self, theNameOfThePlugin: str, func: Class.Module, **kwargs) -> None:
+        returnValue = func.run(**kwargs)
+        if isinstance(returnValue, abnormal.PackageRun):
+            # 运行错误
+            self.logData.fileMapping.append(returnValue)
+            return
+
+        self.returnValue[theNameOfThePlugin] = returnValue
+        # 将返回值放入到
 
 
 def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: dict) -> Class.PlugInRunData:
@@ -68,7 +93,7 @@ def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: 
     run_order = wordProcessing.sorting_plugin(run_order)
     if not isinstance(run_order, tuple):
         time_wrapper = decorators.TimeWrapper()
-        info_wrapper = decorators.InfoWrapper(Config.functions)
+        info_wrapper = decorators.InfoWrapper(file_config.functions)
         for __level__, L in run_order.items():
             data = multiThreadedHelperFunctions.file_import(multithreading, fileImport.f, L, listOfFiles,
                                                 wrapper_list=[time_wrapper.wrapper, info_wrapper.wrapper])
@@ -111,7 +136,7 @@ def __singleThreaded__(listOfFiles: dict) -> Class.PlugInRunData:
     run_order = wordProcessing.sorting_plugin(run_order)
     if not isinstance(run_order, tuple):
         time_wrapper = decorators.TimeWrapper()
-        info_wrapper = decorators.InfoWrapper(Config.functions)
+        info_wrapper = decorators.InfoWrapper(file_config.functions)
         for __level__, L in run_order.items():
             for name in L:
                 fileImport.f.__name__ = name

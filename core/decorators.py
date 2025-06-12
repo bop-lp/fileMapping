@@ -61,7 +61,7 @@ class TimeWrapper(Class.TimeWrapper):
             result = func(*args, **kwargs)
             end_time = time.time()
             self.data[func.__name__] = Class.PluginTimestamp(
-                {
+                **{
                     "init": start_time,
                     "end": end_time,
                     "take": end_time - start_time

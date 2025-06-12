@@ -40,7 +40,7 @@ class Module(Class.Module):
         if isinstance(self.pack, abnormal.PackageImport):
             raise self.pack
 
-    def run(self, **kwargs) -> Any:
+    def run(self, **kwargs) -> Union[Any, abnormal.PackageRun]:
         """
         运行包
         :return:
@@ -52,8 +52,8 @@ class Module(Class.Module):
             parameterFilling = helperFunctions.parameterFilling(self.pointer, kwargs)
             return self.pointer(**parameterFilling)
 
-        except Exception:
-            raise abnormal.PackageRun(traceback.format_exc(), self.path)
+        except Exception as e:
+            raise abnormal.PackageRun(traceback.format_exc(), self.path, e)
 
 
 def f(path: str) -> Union[Class.Module, bool]:
