@@ -40,7 +40,7 @@ functions = {
     "__end__": 'end',
     "__level__": -1,
     "__init__.py": "__init__.py",
-    "__init__": "__init__.py",
+    "__init__": False,
     "__version__": None,
     "__dependenciesOnPlugins__": [],
     "__temporaryFolders__": None,

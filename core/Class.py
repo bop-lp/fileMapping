@@ -69,9 +69,6 @@ class FilemappingDict:
             setattr(self, key, value)
 
 
-class PlugInData(FilemappingDict): ...
-
-
 logData = TypeVar("logData", bound="List[abnormal.Mistake]")
 
 
@@ -149,7 +146,16 @@ class Decorators:
 
 
 # 插件的基本类 一般用不的 就是用来继承的
-class PlugIns(FilemappingDict): ...
+class PlugIns(FilemappingDict):
+    def items(self) -> ItemsView[str, Any]:
+        # 这里直接调用父类的 items 方法
+        return super().items()
+
+    def __init__(self, initial_data: Dict[str, dict] = None):
+        super().__init__()
+        if initial_data:
+            self.update(initial_data)
+
 
 
 # 给TimeWrapper 类 用于记录插件运行时间信息类
@@ -208,32 +214,29 @@ class InfoWrapper(Decorators):
 module_type = TypeVar('module_type', bound='Module')
 
 
-class CallObject(PlugIns, Dict[str, module_type]):
-    def items(self) -> ItemsView[str, Module]: ...
+class CallObject(PlugIns, Dict[str, module_type]):  ...
+
 
 
 # PlugInRunData 的子类 用于保存插件 ModuleType(python的 ModuleType 类) 类
 moduleType_type = TypeVar('moduleType_type', bound='ModuleType')
 
 
-class Invoke(PlugIns, Dict[str, moduleType_type]):
-    def items(self) -> ItemsView[str, ModuleType]: ...
+class Invoke(PlugIns, Dict[str, moduleType_type]): ...
 
 
 # Information 的子类 用于保存插件运行时间和信息类
 run_time_type = TypeVar('run_time_type', bound='PluginTimestamp')
 
 
-class RunTime(PlugIns, Dict[str, run_time_type]):
-    def items(self) -> ItemsView[str, PluginTimestamp]: ...
+class RunTime(PlugIns, Dict[str, run_time_type]): ...
 
 
 # Information 的子类 用于保存插件信息类
 File_info_type = TypeVar('File_info_type', bound='PlugInRetention')
 
 
-class FileInfo(PlugIns, Dict[str, File_info_type]):
-    def items(self) -> ItemsView[str, PlugInRetention]: ...
+class FileInfo(PlugIns, Dict[str, File_info_type]): ...
 
 
 class FunctionTypeData(FilemappingDict):
@@ -298,16 +301,26 @@ class PlugInRunData(PlugIns):
                  information: Union[Information, dict]):
         super().__init__()
 
-        self.callObject = CallObject(callObject)
+        self.callObject = CallObject(callObject) if isinstance(callObject, dict) else callObject
         # 这里是插件 callObject 类 保存插件 Module 类
-        self.invoke = Invoke(invoke)
+        self.invoke = Invoke(invoke) if isinstance(invoke, dict) else invoke
         # 这里是插件 invoke 类 保存插件 python.Module 类
-        self.information = Information(information)
+        self.information = Information(information) if isinstance(information, dict) else information
         # 这里是插件 information 类 保存插件 插件信息和运行时间 类
         self.moduleAbnormal: List[abnormal.Mistake] = []
 
 
 class ReturnValue(FilemappingDict): ...
+
+
+
+
+class PlugInData(FilemappingDict):
+    # 这里是插件数据
+    parameterApplication: Dict
+    # parameterApplication: Dict[str, ParameterApplication]
+    decorators: DecoratorsData
+    builtInPlugins: FilemappingDict
 
 
 # 核心类
@@ -358,3 +371,4 @@ class RegisterData(FilemappingDict):
 
         self.registerList = registerList
         self.end_func = end_func
+

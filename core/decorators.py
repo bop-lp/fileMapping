@@ -101,10 +101,10 @@ class InfoWrapper(Class.InfoWrapper):
 
 def functionRegistrations(name: str = None):
     def func_wrapper(func: Union[FunctionType, ModuleType]):
-        data.File.plugInRunData.information.decorators.functionRegistrations.append(Class.FunctionTypeData(
+        # 注册函数
+        data.plugInData.decorators.functionRegistrations.append(Class.FunctionTypeData(
             func.__name__ if name is None else name, func
         ))
-        # 注册函数
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):

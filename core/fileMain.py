@@ -13,6 +13,7 @@ from . import multiThreadedHelperFunctions
 
 from . import wordProcessing
 from . import fileImport
+from . import parameterApplication
 
 
 class File(data.File):
@@ -49,8 +50,9 @@ class File(data.File):
         else:
             self.plugInRunData = __singleThreaded__(listOfFiles)
 
-        for i in self.plugInRunData.moduleAbnormal:
-            print(i.stack)
+        parameterApplication.ApplyParameter(self)
+        # for i in self.plugInRunData.moduleAbnormal:
+        #     print(i.stack)
 
 
 def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: dict) -> Class.PlugInRunData:

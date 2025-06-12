@@ -5,15 +5,19 @@ fileMappingConfig.functions
 
 """
 import atexit
-import shutil
 import functools
 import os
 import traceback
 import types
+from types import FunctionType
 
 from . import Class
 from . import abnormal
 from . import data
+from . import helperFunctions
+
+
+import rich
 
 
 registerData = Class.RegisterData()
@@ -72,117 +76,39 @@ def wrapper(func: Class.ParameterApplication):
     registerData.registerList.append(wrapper_func)
     return func
 
-
 @wrapper
-class TemporaryFolders(Class.ParameterApplication):
-    def __init__(self, self_info: Class.File):
-        super().__init__(self_info)
-
-        self.self_info = self_info
-        self.temporaryFolders = True
-        if not self_info.path in [False, True, None, '']:  # temporaryFolders 关闭
-            self.path = os.path.join(self_info.lordPath, self_info.public.config['temporaryFolders'])
-
-            self.information_temporaryFolders = self.self_info.information["temporaryFolders"] = {}  # 临时文件夹信息
-            self.logs = self.self_info.logs["temporaryFolders"] = {"error": []}
-            self.create_path = []
-            self.init_tmp = False
-            # 用于判断临时的文件夹是否自主创建，如果是的话则在结束时删除
-            if not os.path.exists(self.path):
-                os.mkdir(self.path)
-                self.init_tmp = True
-
-        else:
-            self.temporaryFolders = False
-
-    def __mkdir(self, temporaryFolders):
-        path = os.path.join(self.path, temporaryFolders)
-        try:
-            if not os.path.exists(path):
-                os.mkdir(path)
-                self.create_path.append(path)
-
-            self.information_temporaryFolders[temporaryFolders] = path
-            return True
-
-        except FileExistsError as e:
-            self.logs["error"].append({path: e})
-            return False
-
+class PlugInData(Class.ParameterApplication):
     def init(self):
-        if not self.temporaryFolders:
-            return False
-
-        for key, value in self.self_info.Class.File_info.items():
-            temporaryFolders = value['__temporaryFolders__']
-            if temporaryFolders is None:
-                continue
-
-            if isinstance(temporaryFolders, str):
-                self.__mkdir(temporaryFolders)
-
-            else:  # temporaryFolders is a list
-                for folder in temporaryFolders:
-                    self.__mkdir(folder)
-
-    def end(self):
-        for i in self.create_path:
-            shutil.rmtree(i)
-
-        if self.init_tmp:
-            shutil.rmtree(self.path)
+        # 给插件创建一个plugInData的空间
+        for plugInsName in self.self_info.plugInRunData.callObject:
+            self.self_info.plugInData[plugInsName] = Class.FilemappingDict()
 
 
 @wrapper
-class DataFolders(Class.ParameterApplication):
+class Config(Class.ParameterApplication):
     def __init__(self, self_info: Class.File):
+        # 读取每个插件配置文件
         super().__init__(self_info)
 
-        self.self_info = self_info
-        self.dataFolders = True
-        self.create_path = []
-        self.rootPath = self_info.public.get("config", {}).get("rootPath", False)  # 根目录
-        run = self_info.public.get("config", {}).get("dataFolder", False)
-        if not ((self.rootPath is False) and (run is False)):
-            # dataFolders 开启
-            self.logs = self.self_info.logs["dataFolders"] = {"error": []}
-            dataFolder_path = self_info.public.config["dataFolder"]
-            self.information_dataFolders = self.self_info.information["dataFolders"] = {}  # 临时文件夹信息
-            self.path = os.path.join(self.rootPath, dataFolder_path)
-            if not os.path.exists(self.path):
-                os.mkdir(self.path)  # 创建 dataFolder 目录
-
-        else:
-            self.dataFolders = False
-
-    def __mkdir(self, file_path):
-        path = os.path.join(self.path, file_path)
-        try:
-            if not os.path.exists(path):
-                os.mkdir(path)
-                self.create_path.append(path)
-
-            self.information_dataFolders[file_path] = path
-            return True
-
-        except FileExistsError as e:
-            self.logs["error"].append({path: e})
-            return False
+        self.plugInData = self.self_info.plugInData
 
     def init(self):
-        if not self.dataFolders:
-            return False
-
-        for key, value in self.self_info.Class.File_info.items():
-            dataFolders = value['__dataFolders__']
-            if dataFolders is None:
+        for plugInsName, plugInsObject in self.self_info.plugInRunData.invoke.items():
+            if "config" not in dir(plugInsObject):
                 continue
 
-            if isinstance(dataFolders, str):
-                dataFolders = [dataFolders]
+            plugInsConfig = getattr(plugInsObject, "config")
+            if isinstance(plugInsConfig, dict):
+                 pass
 
-            for dataFolder in dataFolders:
-                self.__mkdir(dataFolder)  # 创建 dataFolder 目录
+            elif isinstance(plugInsConfig, types.ModuleType):
+                plugInsConfig = helperFunctions.configConvertTodict(plugInsConfig)
+
+            else:
+                continue
+
+            self.plugInData[plugInsName].config = plugInsConfig
+            # 其中config是插件的配置文件信息
 
 
 @wrapper
@@ -190,20 +116,34 @@ class Init(Class.ParameterApplication):
     def __init__(self, self_info: Class.File):
         super().__init__(self_info)
 
+    def pointer(self, key, func):
+        self.self_info.plugInRunData.callObject[key].pointer = func
+
     def init(self):
         for key, value in self.self_info.plugInRunData.information.file_info.items():
-            _ = None
-            if not value['__init__'] is [None, False, '']:
-                try:
-                    _ = getattr(self.self_info.plugInRunData.callObject[key].pack, value['__init__'])
+            pack = self.self_info.plugInRunData.callObject[key].pack
+            # pointer 是函数的存放地
+            # pack 是插件的包
 
-                except AttributeError as e:
-                    self.self_info.logData.parameterApplication.append(
-                        abnormal.ParameterApplicationInit(key, e, traceback.format_exc())
-                    )
+            if value['__init__'] in [None, False, '']:
+                continue
 
-            self.self_info.plugInRunData.callObject[key].pointer = _
+            if not value['__init__'] in dir(pack):
+                _ = value['__init__']
 
+            elif not "main" in dir(pack):
+                _ = "main"
+
+            else:
+                continue
+
+            pointer = getattr(pack, _)
+            if isinstance(pointer, str):
+                pointer = getattr(pack, pointer) if pointer in dir(pack) else None
+                self.pointer(key, pointer)
+
+            elif isinstance(pointer, FunctionType):
+                self.pointer(key, pointer)
 
 
 @wrapper
@@ -214,43 +154,9 @@ class Run(Class.ParameterApplication):
         self.self_info = self_info
 
     def init(self):
-        for key, value in self.self_info.plugInRunData.information.items():
+        for key, value in self.self_info.plugInRunData.information.file_info.items():
             if value['__run__'] is False:
                 self.self_info.plugInRunData.callObject[key].pointer = None
-
-
-@wrapper
-class ReadRegistration(Class.ParameterApplication):
-    def __init__(self, self_info: Class.File):
-        """
-        register.threadRegistration
-
-        :param self_info:
-        """
-        super().__init__(self_info)
-
-        self.self_info = self_info
-        self.info = self_info.plugInRunData.information.registration
-        self.logs = self_info.logs["readRegistration"] = {"error": []}
-
-    def init(self):
-        func_list = {}
-        for key, value in self.info.items():
-            level = value['level']
-            if level not in func_list:
-                func_list[level] = []
-
-            func_list[level].append(key)
-
-        func_list = sorted(func_list.items(), key=lambda x: x[0])
-        for level, func_list in func_list:
-            for func in func_list:
-                try:
-                    func(**self.info[func]['kwargs'])
-
-                except Exception as e:
-                    self.self_info.logs['readRegistration']['error'].append({func: e})
-
 
 
 @wrapper
