@@ -1,9 +1,11 @@
 import os
 from collections import ChainMap
-from typing import List
+from types import FunctionType
+from typing import List, Optional
 import inspect
 
 from . import config as Config
+from . import data as fileData
 
 
 def pathValidation(path_lit: list) -> bool:
@@ -135,6 +137,14 @@ def sort(original_dict: dict) -> dict:
     return {key: original_dict[key] for key in sorted(original_dict.keys())}
 
 
+def getAppRegister(appName: str) -> Optional[FunctionType]:
+    """
+    这个函数的作用是获取插件在 decorators.appRegistration 中某个应用的注册函数
+
+    :param appName: 应用名称
+    :return:
+    """
+    return fileData.plugInData.parameterApplication.get(appName, None)
 
 
 __all__ = [
