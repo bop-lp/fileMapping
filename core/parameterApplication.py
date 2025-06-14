@@ -17,9 +17,6 @@ from . import data
 from . import helperFunctions
 
 
-import rich
-
-
 registerData = Class.RegisterData()
 
 
@@ -76,6 +73,7 @@ def wrapper(func: Class.ParameterApplication):
     registerData.registerList.append(wrapper_func)
     return func
 
+
 @wrapper
 class PlugInData(Class.ParameterApplication):
     def init(self):
@@ -87,7 +85,14 @@ class PlugInData(Class.ParameterApplication):
 @wrapper
 class Config(Class.ParameterApplication):
     def __init__(self, self_info: Class.File):
-        # 读取每个插件配置文件
+        """
+        读取插件配置文件信息
+        config 字段必须是字典或者模块
+        如果是模块, 则会自动转换为字典
+        同时获取 plugInRunData.pluginConfig.<插件名字> 的数据混合
+        然后会将字典信息存入 plugInData.<插件名字>.config 字段中
+        :param self_info:
+        """
         super().__init__(self_info)
 
         self.plugInData = self.self_info.plugInData
@@ -106,6 +111,12 @@ class Config(Class.ParameterApplication):
 
             else:
                 continue
+
+            # 获取 plugInRunData.pluginConfig.<插件名字> 的数据
+            userPluginConfig = self.self_info.plugInRunData.pluginConfig.get(plugInsName, False)
+            if isinstance(userPluginConfig, dict):
+                # 深度合并配置文件信息
+                plugInsConfig = helperFunctions.deep_update(userPluginConfig, plugInsConfig)
 
             self.plugInData[plugInsName].config = plugInsConfig
             # 其中config是插件的配置文件信息
@@ -177,7 +188,7 @@ class End(Class.ParameterApplication):
             }
 
         except Exception as e:
-            self.self_info.logData.parameterApplication.append(abnormal.pluginEndError(
+            self.self_info.logData.parameterApplication.append(abnormal.PluginEndError(
                 func.__name__, e, traceback.format_exc()
             ))
             return {

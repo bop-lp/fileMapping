@@ -15,11 +15,13 @@ from . import parameterApplication
 
 
 class File(data.File):
-    def __init__(self, path: Union[str, list], config: dict):
+    def __init__(self, path: Union[str, list], config: dict, pluginConfig: Union[dict, str] = None):
         """
 
         :param path: 插件路径列表 必须为绝对路径
         :param config: fileMapping的配置
+        :param pluginConfig: 这个插件的配置参数
+
         """
         super().__init__()
 
@@ -47,6 +49,16 @@ class File(data.File):
 
         else:
             self.plugInRunData = __singleThreaded__(listOfFiles)
+
+        if isinstance(pluginConfig, dict):
+            self.plugInRunData.pluginConfig = pluginConfig
+
+        elif isinstance(pluginConfig, str):
+            self.plugInRunData.pluginConfig = helperFunctions.configureFolders(path)
+
+        else:
+            error = abnormal.PlugInsConfigTypeError(type(pluginConfig))
+            self.logData.fileMapping.append(error)
 
         parameterApplication.ApplyParameter(self)
 

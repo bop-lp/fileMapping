@@ -95,7 +95,7 @@ class PluginLoopsDependencies(PlugIns):
         return f"插件循环依赖错误 '{self.plugInLoops}'"
 
 
-class pluginEndError(PlugIns):
+class PluginEndError(PlugIns):
     error: str
     stack: str
     def __init__(self, nameOfThePlugin: str, error: str, stack: str):
@@ -152,4 +152,83 @@ class ParameterApplicationInit(ParameterApplication):
 
     def chinese(self) -> str:
         return f"应用初始化错误: {self.ApplicationName} 错误: {self.error}"
+
+
+class PlugInsConfig(PlugIns): ...
+
+
+class PlugInsConfigTypeError(PlugInsConfig):
+    def english(self) -> str:
+        return f"config type error: {self.nameOfThePlugin} should be dict or str(path) type"
+
+    def chinese(self) -> str:
+        return f"config 配置文件类型错误: {self.nameOfThePlugin} 应该是字典类型或str(路径)类型"
+
+
+class PlugInConfigurationIsIncorrect(PlugInsConfig):
+    def __init__(self, selfPlugInName: str, error: str, stack: str):
+        super().__init__(selfPlugInName)
+
+        self.error = error
+        self.stack = stack
+
+    def english(self) -> str:
+        return f"Plugin configuration error: {self.nameOfThePlugin} error: {self.error}"
+
+    def chinese(self) -> str:
+        return f"插件配置错误: {self.nameOfThePlugin} 错误: {self.error}"
+
+
+class File(Mistake):
+    def __init__(self, fileName: str, error: str, stack: str):
+        self.stack = stack
+        self.fileName = fileName
+        self.error = error
+
+
+class Folder(Mistake):
+    def __init__(self, folderName: str, error: str, stack: str):
+        self.stack = stack
+        self.folderName = folderName
+        self.error = error
+
+
+class FolderCreationFailed(Folder):
+    def english(self) -> str:
+        return f"Failed to create folder {self.folderName}, error message: {self.error}"
+
+    def chinese(self) -> str:
+        return f"创建文件夹 {self.folderName} 失败，错误信息：{self.error}"
+
+
+class FolderDeletion(Folder):
+    def english(self) -> str:
+        return f"Failed to delete folder {self.folderName}, error message: {self.error}"
+
+    def chinese(self) -> str:
+        return f"删除文件夹 {self.folderName} 失败，错误信息：{self.error}"
+
+
+class FileCreationFailed(File):
+    def english(self) -> str:
+        return f"Failed to create folder {self.fileName}, error message: {self.error}"
+
+    def chinese(self) -> str:
+        return f"创建文件 {self.fileName} 失败，错误信息：{self.error}"
+
+
+class FileDeletion(File):
+    def english(self) -> str:
+        return f"Failed to delete folder {self.fileName}, error message: {self.error}"
+
+    def chinese(self) -> str:
+        return f"删除文件 {self.fileName} 失败，错误信息：{self.error}"
+
+
+class FileReadFailed(File):
+    def english(self) -> str:
+        return f"Failed to read file {self.fileName}, error message: {self.error}"
+
+    def chinese(self) -> str:
+        return f"读取文件 {self.fileName} 失败，错误信息：{self.error}"
 

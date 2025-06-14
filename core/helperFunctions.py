@@ -1,11 +1,13 @@
 import os
 from collections import ChainMap
 from types import FunctionType
-from typing import List, Optional
+from typing import List, Optional, Union
 import inspect
+import traceback
 
 from . import config as Config
 from . import data as fileData
+from . import abnormal
 
 
 def pathValidation(path_lit: list) -> bool:
@@ -145,6 +147,49 @@ def getAppRegister(appName: str) -> Optional[FunctionType]:
     :return:
     """
     return fileData.plugInData.parameterApplication.get(appName, None)
+
+
+def generateObjects(plugInName: str, goal: str) -> Union[dict, abnormal.PlugInConfigurationIsIncorrect]:
+    """
+    生成插件 config 对象
+    :param goal: 文件中的文本
+    :return:
+    """
+    returnValue = {}
+    try:
+        exec(goal, {}, returnValue)
+    except Exception as e:
+        return abnormal.PlugInConfigurationIsIncorrect(plugInName, e, traceback.format_exc())
+
+    return returnValue
+
+
+def configureFolders(path: str) -> dict:
+    """
+    配置插件文件夹
+    :param path: 绝对路径 插件文件夹路径
+    :return:
+    """
+    if not os.path.isdir(path):
+        return {}
+
+    plugInConfiguration = {}
+    for configPath in os.listdir(path):
+        absolutePath = os.path.join(path, configPath)
+
+        try:
+            with open(absolutePath, "r", encoding="utf-8") as f:
+                plugInConfigurationObject = generateObjects(configPath, f.read())
+
+        except Exception as e:
+            plugInConfigurationObject = abnormal.FileReadFailed(absolutePath, e, traceback.format_exc())
+
+        plugInConfiguration[configPath] = plugInConfigurationObject
+
+    return plugInConfiguration
+
+
+
 
 
 __all__ = [

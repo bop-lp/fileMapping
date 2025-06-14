@@ -4,5 +4,10 @@
 /venv/
 /plugins/
 /plugins/__pyache__
+/core/__pyache__
 /fileMapping/__pyache__
 /fileMapping/core/__pyache__
+/builtInPlugins/__pycache__
+
+*/__pycache__
+*.pyc

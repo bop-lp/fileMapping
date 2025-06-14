@@ -3,25 +3,25 @@ import shutil
 import traceback
 from typing import List
 
-from fileMapping.core import decorators
+from fileMapping.core import parameterApplication
 from fileMapping.core import Class
+from fileMapping.core import abnormal
 
-from . import abnormal
 from . import helperFunctions
 
 
-@decorators.appRegistration()
+@parameterApplication.wrapper
 class TemporaryFolders(Class.ParameterApplication):
     def __init__(self, self_info: Class.File):
         super().__init__(self_info)
 
-        self.config = self.self_info.plugInData.Folder.config
+        self.config = self.self_info.plugInData.Folders.config
         self.tempFolderPath = False
         self.whetherItIsSelfCreated = False
         self.createList: List[str] = []
         # 文件列表
 
-        if self.config.tempFolderPath is not [None, '', False]:
+        if self.config["tempFolderPath"] in [None, '', False]:
             # 是否开启临时文件夹路径
             return
 

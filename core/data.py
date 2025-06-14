@@ -1,4 +1,4 @@
-from typing import Tuple, Dict
+from typing import Dict
 
 
 from . import Class
@@ -40,10 +40,16 @@ class ConfigData(Class.ConfigData): ...
 class ReturnValue(Class.ReturnValue): ...
 
 
+class PublicData(Class.FilemappingDict): ...
+# 这里是公共数据
+
+
 logData = LogData()
 plugInData = PluginData()
 configData = ConfigData()
 returnValue = ReturnValue()
+publicData = PublicData()
+# 公共数据
 
 
 class File(Class.File):

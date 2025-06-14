@@ -4,8 +4,7 @@ import traceback
 from typing import Dict, Union
 
 from fileMapping.core import Class
-
-from . import abnormal
+from fileMapping.core import abnormal
 
 
 def mkdir(file_path) -> Union[bool, abnormal.FolderCreationFailed]:

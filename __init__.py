@@ -29,7 +29,7 @@ from .core import wordProcessing
 if not __name__ == '__main__':
     # print(pathConversion(__file__, "builtInPlugins"))
     # print(os.path.dirname(__file__), os.path.abspath("builtInPlugins"))
-    _f = File(pathConversion(__file__, "builtInPlugins"), {})
+    _f = File(pathConversion(__file__, "builtInPlugins"), {}, {})
 
 
 __all__ = [

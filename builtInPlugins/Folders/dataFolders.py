@@ -2,20 +2,21 @@ import os
 import shutil
 import traceback
 
-from fileMapping.core import decorators
+from fileMapping.core import parameterApplication
 from fileMapping.core import Class
+from fileMapping.core import abnormal
 
-from . import abnormal
 from . import helperFunctions
+from . import config
 
 
-@decorators.appRegistration()
+@parameterApplication.wrapper
 class DataFolder(Class.ParameterApplication):
     def __init__(self, parent: Class.File):
         super().__init__(parent)
 
         self.dataFolder: bool = True
-        self.filePath = self.self_info.plugInData.Folders.config.dataFolderPath
+        self.filePath = self.self_info.plugInData.Folders.config["dataFolderPath"]
         self.createList = []
         # 文件列表
         self.self_info.plugInData.Folders.DataFolder = {}

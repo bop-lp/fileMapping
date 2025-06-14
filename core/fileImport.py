@@ -6,8 +6,6 @@ from typing import Any, Union
 import traceback
 import importlib
 
-import rich
-
 from . import config
 from . import Class
 from . import abnormal
@@ -36,7 +34,6 @@ class Module(Class.Module):
 
         self.pack = py_import(self.absolutePath, self.packageName)
 
-        # rich.print(dir(self.pack))
         if isinstance(self.pack, abnormal.PackageImport):
             raise self.pack
 

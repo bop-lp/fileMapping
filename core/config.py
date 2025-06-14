@@ -122,7 +122,7 @@ for i in path:
 path = _[::-1]
 
 
-multithreading: bool = True
+multithreading: bool = False
 # 是否开启多线程
 numberOfThreads: int = 4
 # 线程数 - 合理的线程数 4 - 6

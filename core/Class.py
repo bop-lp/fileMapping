@@ -301,9 +301,10 @@ class PlugInRunData(PlugIns):
     invoke: Invoke = Invoke
     information: Information = Information
     moduleAbnormal: List[abnormal.Mistake] = []
+    pluginConfig: Union[dict]
 
     def __init__(self, callObject: Union[CallObject, dict], invoke: Union[Invoke, dict],
-                 information: Union[Information, dict]):
+                 information: Union[Information, dict], pluginConfig: Union[dict] = None):
         super().__init__()
 
         self.callObject = CallObject(callObject) if isinstance(callObject, dict) else callObject
@@ -313,6 +314,7 @@ class PlugInRunData(PlugIns):
         self.information = Information(information) if isinstance(information, dict) else information
         # 这里是插件 information 类 保存插件 插件信息和运行时间 类
         self.moduleAbnormal: List[abnormal.Mistake] = []
+        self.pluginConfig: Union[dict] = pluginConfig
 
 
 class ReturnValue(FilemappingDict): ...
