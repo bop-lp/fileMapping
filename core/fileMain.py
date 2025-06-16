@@ -120,8 +120,9 @@ def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: 
             ]
 
             for k in moduleData:
-                plugInData.callObject[k.packageName] = k
-                plugInData.invoke[k.packageName] = k.pack
+                packageName = k.packageName[:-3] if k.packageName.endswith(".py") else k.packageName
+                plugInData.callObject[packageName] = k
+                plugInData.invoke[packageName] = k.pack
 
         else:
             # 获取 时间 & 信息 -> information.run_time & file_info
