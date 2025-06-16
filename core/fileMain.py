@@ -119,8 +119,9 @@ def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: 
                 i for i in data if not isinstance(i, Class.Module)
             ]
 
-            plugInData.callObject.update(dict(zip(L, moduleData)))
-            plugInData.invoke.update(dict(zip(L, [i.pack for i in moduleData])))
+            for k in moduleData:
+                plugInData.callObject[k.packageName] = k
+                plugInData.invoke[k.packageName] = k.pack
 
         else:
             # 获取 时间 & 信息 -> information.run_time & file_info
