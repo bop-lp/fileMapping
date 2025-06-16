@@ -82,6 +82,10 @@ class File(data.File):
             self._run_(key, value, **kwargs)
 
     def _run_(self, theNameOfThePlugin: str, func: Class.Module, **kwargs) -> None:
+        kwargs = {
+            "fileMapping": self,
+            **kwargs
+        }
         returnValue = func.run(**kwargs)
         if isinstance(returnValue, abnormal.PackageRun):
             # 运行错误

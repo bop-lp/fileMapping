@@ -74,10 +74,11 @@ def py_import(file_path: os.path, callObject: str) -> Union[ModuleType, abnormal
     :return:
 
     """
+
     path = copy.copy(sys.path)
     callObject = callObject.split('.')[0]  # 去除 .py
     try:
-        sys.path = [file_path]
+        sys.path = [file_path] + sys.path
         the_api = importlib.import_module(callObject)
 
     except Exception:

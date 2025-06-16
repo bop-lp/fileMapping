@@ -3,7 +3,6 @@
 可以具体调仓插件的配置文件
 """
 import os
-import json
 from types import ModuleType
 
 
