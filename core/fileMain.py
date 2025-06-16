@@ -54,7 +54,7 @@ class File(data.File):
             self.plugInRunData.pluginConfig = pluginConfig
 
         elif isinstance(pluginConfig, str):
-            self.plugInRunData.pluginConfig = helperFunctions.configureFolders(path)
+            self.plugInRunData.pluginConfig = helperFunctions.configureFolders(pluginConfig)
 
         else:
             error = abnormal.PlugInsConfigTypeError(type(pluginConfig))

@@ -232,3 +232,12 @@ class FileReadFailed(File):
     def chinese(self) -> str:
         return f"读取文件 {self.fileName} 失败，错误信息：{self.error}"
 
+
+class FileFormattingError(File):
+    def english(self) -> str:
+        return f"Plugin-ConfigFile formatting error: {self.fileName} error: {self.error}"
+
+    def chinese(self) -> str:
+        return f"插件-配置文件格式化错误: {self.fileName} error: {self.error}"
+
+

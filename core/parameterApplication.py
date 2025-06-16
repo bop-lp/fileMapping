@@ -116,11 +116,20 @@ class Config(Class.ParameterApplication):
             userPluginConfig = self.self_info.plugInRunData.pluginConfig.get(plugInsName, False)
             if isinstance(userPluginConfig, dict):
                 # 深度合并配置文件信息
-                plugInsConfig = helperFunctions.deep_update(userPluginConfig, plugInsConfig)
+                plugInsConfig = helperFunctions.deep_update(plugInsConfig, userPluginConfig)
 
             self.plugInData[plugInsName].config = plugInsConfig
             # 其中config是插件的配置文件信息
 
+        for plugInsName, plugInsObject in self.self_info.plugInRunData.pluginConfig.items():
+            plugInsConfig = self.plugInData.get(plugInsName, False)
+            if isinstance(plugInsConfig, dict):
+                plugInsConfig = helperFunctions.deep_update(plugInsConfig["config"], plugInsObject)
+                self.plugInData[plugInsName].config = plugInsConfig
+
+            elif isinstance(plugInsConfig, Class.FilemappingDict):
+                plugInsConfig = helperFunctions.deep_update(plugInsConfig.config, plugInsObject)
+                self.plugInData[plugInsName].config = plugInsConfig
 
 @wrapper
 class Init(Class.ParameterApplication):

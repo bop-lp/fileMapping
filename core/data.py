@@ -40,7 +40,7 @@ class ConfigData(Class.ConfigData): ...
 class ReturnValue(Class.ReturnValue): ...
 
 
-class PublicData(Class.FilemappingDict): ...
+# class PublicData(Class.FilemappingDict): ...
 # 这里是公共数据
 
 
@@ -48,7 +48,7 @@ logData = LogData()
 plugInData = PluginData()
 configData = ConfigData()
 returnValue = ReturnValue()
-publicData = PublicData()
+# publicData = PublicData()
 # 公共数据
 
 
