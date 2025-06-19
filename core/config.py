@@ -30,6 +30,11 @@ functionsName = {
     # 0.3.19 新增参数
     **{
         "__dataFolders__": "__dataFolders__"
+    },
+
+    # 0.4.0 新增参数
+    **{
+        "__multipleInstances__": "__multipleInstances__",
     }
 }
 functions = {
@@ -46,7 +51,8 @@ functions = {
     "__temporaryFolders__": None,
     "__error__": None,
     "__underlying__": False,
-    "__dataFolders__": None
+    "__dataFolders__": None,
+    "__multipleInstances__": None,
 }
 """
 __level__
