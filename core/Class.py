@@ -93,6 +93,7 @@ class ConfigData(FilemappingDict):
     multithreading: bool
     numberOfThreads: int
     endTask: bool
+    disablePlugins: List[str]
 
 
 # 以上是数据类

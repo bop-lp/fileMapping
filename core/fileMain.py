@@ -40,6 +40,12 @@ class File(data.File):
         data.configData = data.ConfigData(config)
         self.config = data.configData
         self.path = path
+        # 禁用插件 data.configData.disablePlugins
+        listOfFiles = {
+            key: value
+            for key, value in listOfFiles.items()
+            if key in data.configData.disablePlugins
+        }
 
         if self.config.get('multithreading', False):
             self.multithreading = multithreading.EnableMultithreading(

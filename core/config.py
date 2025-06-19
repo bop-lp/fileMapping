@@ -6,6 +6,7 @@
 import os.path
 import sys
 import copy
+from typing import List
 
 functionsName = {
     # 保留参数
@@ -139,6 +140,11 @@ endTask: bool = True
 
 __builtInPlugins = 'builtInPlugins'
 # 内置插件的目录名
+
+
+disablePlugins: List[str]= []
+# 禁用插件列表
+# list[<插件名字>]
 
 __all__ = [
     "functionsName",
