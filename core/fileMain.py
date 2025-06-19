@@ -44,7 +44,7 @@ class File(data.File):
         listOfFiles = {
             key: value
             for key, value in listOfFiles.items()
-            if key in data.configData.disablePlugins
+            if not key in data.configData.disablePlugins
         }
 
         if self.config.get('multithreading', False):
