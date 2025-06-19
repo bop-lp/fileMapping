@@ -139,19 +139,28 @@ def sort(original_dict: dict) -> dict:
     return {key: original_dict[key] for key in sorted(original_dict.keys())}
 
 
-def getAppRegister(appName: str) -> Optional[FunctionType]:
+def getAppRegister(nameOfThePlugin: str, nameOfTheFunction: str) -> Optional[FunctionType]:
     """
     这个函数的作用是获取插件在 decorators.appRegistration 中某个应用的注册函数
 
-    :param appName: 应用名称
+    :param nameOfThePlugin: 插件名
+    :param nameOfTheFunction: 注册函数名
     :return:
     """
-    return fileData.plugInData.parameterApplication.get(appName, None)
+    if not nameOfThePlugin in fileData.plugInData.parameterApplication:
+        return None
+
+    if not nameOfTheFunction in fileData.plugInData.parameterApplication[nameOfThePlugin]:
+        return None
+
+    return fileData.plugInData.parameterApplication[nameOfThePlugin][nameOfTheFunction]
+
 
 
 def generateObjects(plugInName: str, goal: str) -> Union[dict, abnormal.PlugInConfigurationIsIncorrect]:
     """
     生成插件 config 对象
+    :param plugInName: 插件名字
     :param goal: 文件中的文本
     :return:
     """

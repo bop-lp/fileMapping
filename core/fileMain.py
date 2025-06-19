@@ -113,20 +113,16 @@ def __multithreading__(multithreading: Class.EnableMultithreading, listOfFiles: 
         for __level__, L in run_order.items():
             data = multiThreadedHelperFunctions.file_import(multithreading, fileImport.f, L, listOfFiles,
                                                 wrapper_list=[time_wrapper.wrapper, info_wrapper.wrapper])
-            # callObject |= dict(zip(L, data))
-            # invoke |= dict(zip(L, [i.pack for i in data]))
-            # 以上是 python3.9 才支持的语法
-            moduleData = [
-                i for i in data if isinstance(i, Class.Module)
-            ]
-            plugInData.moduleAbnormal += [
-                i for i in data if not isinstance(i, Class.Module)
-            ]
 
-            for k in moduleData:
-                packageName = k.packageName[:-3] if k.packageName.endswith(".py") else k.packageName
-                plugInData.callObject[packageName] = k
-                plugInData.invoke[packageName] = k.pack
+            for i in data:
+                if isinstance(i, Class.Module):
+                    packageName = i.packageName[:-3] if i.packageName.endswith(".py") else i.packageName
+                    plugInData.callObject[packageName] = i
+                    plugInData.invoke[packageName] = i.pack
+
+                else:
+                    # 运行错误
+                    plugInData.moduleAbnormal.append(i)
 
         else:
             # 获取 时间 & 信息 -> information.run_time & file_info

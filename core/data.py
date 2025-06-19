@@ -8,6 +8,8 @@ from . import Class
 class PluginData(Class.PlugInData):
     # 这里是插件数据
     parameterApplication: Dict[str, Class.ParameterApplication] = {}
+    # 这里是插件注册数据
+    # parameterApplication => {<插件名字>: {<函数名字>: [FunctionType], ...}, ...}
     decorators: Class.DecoratorsData
     builtInPlugins: Class.FilemappingDict = Class.FilemappingDict()
 

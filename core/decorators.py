@@ -12,7 +12,6 @@ from . import Class
 from . import data
 
 
-
 def parameters_wrapper(func, parameters):
     # 参数装饰器
     if parameters is None:
@@ -47,7 +46,6 @@ def my_wraps(name):
         return func
 
     return decorator
-
 
 
 class TimeWrapper(Class.TimeWrapper):
@@ -98,45 +96,45 @@ class InfoWrapper(Class.InfoWrapper):
         return wrapper
 
 
-
-def functionRegistrations(name: str = None):
-    def func_wrapper(func: Union[FunctionType, ModuleType]):
-        # 注册函数
-        data.plugInData.decorators.functionRegistrations.append(Class.FunctionTypeData(
-            func.__name__ if name is None else name, func
-        ))
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            result = func(*args, **kwargs)
-            return result
-
-        return wrapper
-
-    return func_wrapper
-
-
-
-# parameterApplication 的装饰器
-def appRegistration(name: str=None):
+# 注册函数
+def appRegistration(nameOfThePlugin: str, name: str = None):
     """
-    参数应用装饰器
-    将数据放入 data.plugInData.parameterApplication 中
-    然后由 parameterApplication.py 的函数进行处理
+    注册函数装饰器
+    :param nameOfThePlugin: 插件名
+    :param name: 函数名字  默认为 None 则为函数名
     """
+
     def func_wrapper(func: Class.ParameterApplication) -> Class.ParameterApplication:
-        data.plugInData.parameterApplication[func.__name__ if name is None else name] = func
+        # 这里是插件注册数据
+        # parameterApplication => {<插件名字>: {<函数名字>: [FunctionType], ...}, ...}
+        if not data.plugInData.parameterApplication.get(nameOfThePlugin):
+            data.plugInData.parameterApplication[nameOfThePlugin] = {}
+
+        # 这里是函数注册数据
+        data.plugInData.parameterApplication[nameOfThePlugin][func.__name__ if name is None else name] = func
 
         return func
+
     return func_wrapper
+
+
+def tagAppRegistration(nameOfThePlugin: str) -> appRegistration:
+    """
+    可以标记插件的注册函数
+    基于 appRegistration 进行装饰
+    :param nameOfThePlugin: 插件名
+    """
+
+    def wrapper_wrapper(name: str = None):
+        return appRegistration(nameOfThePlugin, name)
+
+    return wrapper_wrapper
 
 
 __all__ = [
     "parameters_wrapper",
     "wrapper_recursion",
     "my_wraps",
-    "functionRegistrations",
     "TimeWrapper",
     "InfoWrapper",
 ]
-
