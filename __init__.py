@@ -26,14 +26,14 @@ from .core import wordProcessing
 
 
 # 加载fileMapping的内置插件
-if not __name__ == '__main__':
-    # print(pathConversion(__file__, "builtInPlugins"))
-    # print(os.path.dirname(__file__), os.path.abspath("builtInPlugins"))
-    try:
-        _f = File(pathConversion(__file__, "builtInPlugins"), {}, {})
-    except Exception as e:
-        import rich
-        rich.print(e.stack)
+# if not __name__ == '__main__':
+#     # print(pathConversion(__file__, "builtInPlugins"))
+#     # print(os.path.dirname(__file__), os.path.abspath("builtInPlugins"))
+#     try:
+#         _f = File(pathConversion(__file__, "builtInPlugins"), {}, {})
+#     except Exception as e:
+#         import rich
+#         rich.print(e.stack)
 
 __all__ = [
     *core.__all__

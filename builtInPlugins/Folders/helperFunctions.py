@@ -9,7 +9,10 @@ from fileMapping.core import abnormal
 
 def mkdir(file_path) -> Union[bool, abnormal.FolderCreationFailed]:
     try:
-        # os.makedirs()
+        if os.path.exists(file_path):
+            # 文件夹已存在
+            pass
+
         os.makedirs(file_path)
         return True
 
@@ -51,3 +54,4 @@ def delete(path: str) -> Union[bool, abnormal.FolderDeletion]:
 
     except Exception as e:
         return abnormal.FolderDeletion(path, e, traceback.format_exc())
+

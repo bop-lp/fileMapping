@@ -1,10 +1,14 @@
 import os
 import shutil
 import traceback
+from typing import Optional
 
 from fileMapping.core import parameterApplication
 from fileMapping.core import Class
 from fileMapping.core import abnormal
+from fileMapping.core import decorators
+#
+from fileMapping.core import File
 
 from . import helperFunctions
 from . import config
@@ -40,3 +44,15 @@ class DataFolder(Class.ParameterApplication):
 
             self.self_info.plugInData.Folders.DataFolder[key] = path
 
+
+@decorators.appRegistration(config.__name__)
+def getTemporaryFolders(path: str) -> Optional[str]:
+    if not File.plugInData.get("Folders", False):
+        # 没有Folders插件
+        return None
+
+    if not File.plugInData.Folders.get("DataFolder", False):
+        # 没有运行 TemporaryFolders
+        return None
+
+    return File.plugInData.Folders.DataFolder.get(path, None)

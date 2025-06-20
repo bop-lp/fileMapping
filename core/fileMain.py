@@ -1,3 +1,4 @@
+import os.path
 from typing import Union
 
 from . import data, abnormal
@@ -29,6 +30,9 @@ class File(data.File):
             # 兼容 str
             path = [path]
 
+        # 加入内置插件的路径
+        path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), "builtInPlugins"))
+        # 路径验证
         if helperFunctions.pathValidation(path if isinstance(path, (list, tuple)) else [path]):
             raise FileNotFoundError(f"不是一个有效的绝对路径。: '{path}'")
 

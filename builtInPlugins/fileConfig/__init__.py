@@ -14,6 +14,9 @@ from fileMapping.core import abnormal
 from . import config
 from . import helperFunctions
 
+__level__ = 5
+# 导入等级
+
 
 @parameterApplication.wrapper
 class FileConfig(Class.ParameterApplication):

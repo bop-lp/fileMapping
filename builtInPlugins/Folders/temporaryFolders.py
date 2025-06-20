@@ -1,13 +1,18 @@
 import os
 import shutil
 import traceback
-from typing import List
+from typing import List, Optional
 
 from fileMapping.core import parameterApplication
 from fileMapping.core import Class
 from fileMapping.core import abnormal
+from fileMapping.core import decorators
+# 导入fileMapping的核心模块
+from fileMapping.core import File
 
 from . import helperFunctions
+from . import config
+
 
 
 @parameterApplication.wrapper
@@ -58,3 +63,17 @@ class TemporaryFolders(Class.ParameterApplication):
             _ = helperFunctions.delete(path)
             if isinstance(_, abnormal.FolderDeletion):
                 self.self_info.logData.parameterApplication.append(_)
+
+
+@decorators.appRegistration(config.__name__)
+def getTemporaryFolders(path: str) -> Optional[str]:
+    if not File.plugInData.get("Folders", False):
+        # 没有Folders插件
+        return None
+
+    if not File.plugInData.Folders.get("TemporaryFolders", False):
+        # 没有运行 TemporaryFolders
+        return None
+
+    return File.plugInData.Folders.TemporaryFolders.get(path, None)
+
