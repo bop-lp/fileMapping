@@ -1,5 +1,6 @@
 import os.path
-from typing import Union
+import traceback
+from typing import Union, Tuple, Dict, List
 
 from . import data, abnormal
 from . import Class
@@ -60,16 +61,15 @@ class File(data.File):
         else:
             self.plugInRunData = __singleThreaded__(listOfFiles)
 
-        if isinstance(pluginConfig, dict):
-            self.plugInRunData.pluginConfig = pluginConfig
+        # self.plugInRunData.pluginConfig = getPluginConfig(pluginConfig)
+        plugInConfiguration, errorMessage = getPluginConfig(pluginConfig)
+        if errorMessage.__len__() != 0:
+            # 配置错误
+            # 记录错误信息
+            self.logData.plugInConfiguration.extend(errorMessage)
 
-        elif isinstance(pluginConfig, str):
-            self.plugInRunData.pluginConfig = helperFunctions.configureFolders(pluginConfig)
-
-        else:
-            error = abnormal.PlugInsConfigTypeError(type(pluginConfig))
-            self.logData.fileMapping.append(error)
-
+        # 导入插件配置
+        self.plugInRunData.pluginConfig = plugInConfiguration
         parameterApplication.ApplyParameter(self)
 
     def runOne(self, nameOfThePlugin: str, **kwargs):
@@ -164,9 +164,14 @@ def __singleThreaded__(listOfFiles: dict) -> Class.PlugInRunData:
         for __level__, L in run_order.items():
             for name in L:
                 fileImport.f.__name__ = name
-                plugInData.callObject[name] = info_wrapper.wrapper(time_wrapper.wrapper(fileImport.f))(
-                    listOfFiles[name])
-                plugInData.invoke[name] = plugInData.callObject[name].pack
+                try:
+                    plugInData.callObject[name] = info_wrapper.wrapper(time_wrapper.wrapper(fileImport.f))(
+                        listOfFiles[name])
+                    plugInData.invoke[name] = plugInData.callObject[name].pack
+
+                except abnormal.PackageImport as e:
+                    # 导入错误
+                    plugInData.moduleAbnormal.append(e)
 
         else:
             # 获取 时间 & 信息 -> information.run_time & file_info
@@ -178,3 +183,38 @@ def __singleThreaded__(listOfFiles: dict) -> Class.PlugInRunData:
         raise abnormal.PluginLoopsDependencies(run_order)
 
 
+def getPluginConfig(path: Union[str, dict]) -> Tuple[Dict[str, dict], List[abnormal.Mistake]]:
+    """
+    path: dict
+        插件配置字典
+
+    path: str
+        配置文件路径
+        读取插件配置文件夹
+        这个文件夹是全部插件的配置文件夹
+        如果 文件夹中有一个 "__init__.py" 文件 则认为是模块导入
+        没有的话会使用 exec 函数导入配置文件
+    :param path: 配置文件夹路径
+    :return: (<插件配置字典>, <错误信息>)
+    """
+
+    if isinstance(path, dict):
+        return (path, [])
+
+    else:
+        # path -> str
+        # 导入配置文件
+        # 优化导入
+        listOfFiles = helperFunctions.__fileFiltering__(path, (".py"))
+        returnValue = __singleThreaded__(listOfFiles)
+        errorMessage = []
+        if returnValue.moduleAbnormal.__len__() != 0:
+            # 导入错误
+            errorMessage = returnValue.moduleAbnormal
+
+        # 导入成功
+        # 把 Module 类转化为字典
+        return ({
+                    key: helperFunctions.configConvertTodict(value)
+                    for key, value in returnValue.invoke.items()
+                }, errorMessage)

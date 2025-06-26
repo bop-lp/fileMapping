@@ -209,6 +209,20 @@ class FolderDeletion(Folder):
         return f"删除文件夹 {self.folderName} 失败，错误信息：{self.error}"
 
 
+# 重命名文件夹
+class FolderRename(Folder):
+    def __init__(self, folderName: str, newFolderName: str, error: str, stack: str):
+        super().__init__(folderName, error, stack)
+
+        self.newFolderName = newFolderName
+
+    def english(self) -> str:
+        return f"Failed to rename folder {self.folderName} to {self.newFolderName}, error message: {self.error}"
+
+    def chinese(self) -> str:
+        return f"重命名文件夹 {self.folderName} 到 {self.newFolderName} 失败，错误信息：{self.error}"
+
+
 class FileCreationFailed(File):
     def english(self) -> str:
         return f"Failed to create folder {self.fileName}, error message: {self.error}"

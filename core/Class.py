@@ -77,6 +77,10 @@ class LogData(Dict[str, logData], FilemappingDict):
     fileMapping: List[abnormal.Mistake] = []
     # fileMapping是日志数据
     parameterApplication: List[abnormal.Mistake] = []
+    # parameterApplication是日志数据
+    plugInConfiguration: List[abnormal.Mistake] = []
+    # plugInConfiguration是日志数据
+
 
 
 class ConfigData(FilemappingDict):
