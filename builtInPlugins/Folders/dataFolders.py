@@ -1,7 +1,8 @@
 import os
 import shutil
 import traceback
-from typing import Optional
+from typing import Optional, Union
+import functools
 
 from fileMapping.core import parameterApplication
 from fileMapping.core import Class
@@ -29,6 +30,9 @@ class DataFolder(Class.ParameterApplication):
         if self.dataFolder in ["", False, None]:
             self.dataFolder = False
 
+        decorators.appRegistration(config.__name__)(helperFunctions.wrapper(self.self_info)(createFoldersDynamically))
+
+
     def init(self):
         if not self.dataFolder:
             return
@@ -36,7 +40,6 @@ class DataFolder(Class.ParameterApplication):
         self.createDict = helperFunctions.statistics(self.filePath, self.self_info.plugInRunData.information.file_info)
         # self.createDict = {<名字>: <绝对路径>, ...}
         for key, path in self.createDict.items():
-            # folderPath = os.path.join(self.filePath, path)
             returnValue = helperFunctions.mkdir(path)
             if isinstance(returnValue, abnormal.FolderCreationFailed):
                 self.self_info.logData.parameterApplication.append(returnValue)
@@ -56,3 +59,25 @@ def getTemporaryFolders(path: str) -> Optional[str]:
         return None
 
     return File.plugInData.Folders.DataFolder.get(path, None)
+
+
+def createFoldersDynamically(file: Class.File, path: str) -> Union[str, abnormal.FolderCreationFailed]:
+    """
+    创建文件夹，并返回文件夹的绝对路径
+    :param file:
+    :param path:
+    :return:
+    """
+    if not File.plugInData.Folders.get("DataFolder", False):
+        # 没有运行 TemporaryFolders
+        return None
+
+    folder_path = file.plugInRunData.pluginConfig["Folders"].config["dataFolderPath"]
+    cpath = os.path.join(folder_path, path)
+    returnValue = helperFunctions.mkdir(cpath)
+    if isinstance(returnValue, abnormal.FolderCreationFailed):
+        return returnValue
+
+    file.plugInData.Folders.DataFolder[path] = cpath
+    return cpath
+

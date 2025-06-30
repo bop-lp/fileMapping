@@ -2,6 +2,7 @@ import os
 import shutil
 import traceback
 from typing import Dict, Union
+import functools
 
 from fileMapping.core import Class
 from fileMapping.core import abnormal
@@ -54,4 +55,18 @@ def delete(path: str) -> Union[bool, abnormal.FolderDeletion]:
 
     except Exception as e:
         return abnormal.FolderDeletion(path, e, traceback.format_exc())
+
+
+def wrapper(file: Class.File):
+    """
+    装饰器
+self = {FileConfig} <fileConfig.FileConfig object at 0x000001A9F9D73160>    """
+    def wrapper_func(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(file, *args, **kwargs)
+
+        return wrapper
+
+    return wrapper_func
 

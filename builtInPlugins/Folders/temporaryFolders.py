@@ -1,7 +1,7 @@
 import os
 import shutil
 import traceback
-from typing import List, Optional
+from typing import Dict, Optional
 
 from fileMapping.core import parameterApplication
 from fileMapping.core import Class
@@ -23,7 +23,7 @@ class TemporaryFolders(Class.ParameterApplication):
         self.config = self.self_info.plugInData.Folders.config
         self.tempFolderPath = False
         self.whetherItIsSelfCreated = False
-        self.createList: List[str] = []
+        self.createDict: Dict[str, str] = {}
         # 文件列表
 
         if self.config["tempFolderPath"] in [None, '', False]:
@@ -43,11 +43,14 @@ class TemporaryFolders(Class.ParameterApplication):
         self.self_info.plugInData.Folders.TemporaryFolders = {}
         # 文件夹列表
 
+        decorators.appRegistration(config.__name__)(helperFunctions.wrapper(self)(dynamicTemporaryFolders))
+
+
     def init(self):
         if isinstance(self.tempFolderPath, bool):
             return
 
-        self.createDict  = helperFunctions.statistics(self.config.tempFolderPath, self.self_info.plugInRunData.information.file_info)
+        self.createDict = helperFunctions.statistics(self.config.tempFolderPath, self.self_info.plugInRunData.information.file_info)
 
         for key, path in self.createDict:
             returnValue = helperFunctions.mkdir(os.path.join(self.tempFolderPath, path))
@@ -76,4 +79,21 @@ def getTemporaryFolders(path: str) -> Optional[str]:
         return None
 
     return File.plugInData.Folders.TemporaryFolders.get(path, None)
+
+
+def dynamicTemporaryFolders(self: TemporaryFolders, path: str):
+    """
+    动态创建临时文件夹
+    :param self:
+    :param path:
+    :return:
+    """
+
+    returnValue = helperFunctions.mkdir(os.path.join(self.tempFolderPath, path))
+    if isinstance(returnValue, abnormal.FolderCreationFailed):
+        return returnValue
+
+    self.self_info.plugInData.Folders.TemporaryFolders[path] = returnValue
+    self.createDict[path] = returnValue
+    return returnValue
 
