@@ -41,15 +41,9 @@ pip install fileMapping -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```text
 fileMapping
 └─ document                     // 文档目录
-    ├─ development.md           // 开发文档
     ├─ illustrate.md            // 项目说明文档
     └─ pluginDevelopment.md     // 插件开发文档
 ```
-
-
-
-### 开发文档 [development.md](document/development.md)
-
 
 
 ### 项目说明文档 [illustrate.md](document/illustrate.md)

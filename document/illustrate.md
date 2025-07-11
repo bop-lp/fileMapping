@@ -2,7 +2,7 @@
 
 请注意这里的文档具有时效性
 
-简单来说就是我不会对这个文档做的更新 偶尔做一次 ~~诶，嘿~~
+简单来说就是我不会对这个文档做的更新 偶尔做一次 ~~诶嘿~~
 
 所以呢 `点击标题`跳转到`相关的代码`然后具体查看
 
@@ -157,6 +157,15 @@ RegisterData                        // 注册数据
  └─ ReturnValue        // 插件运行返回值数据类
 ```
 
+#### LogData 类属性
+
+```text
+LogData
+ ├─ fileMapping (list[Mistake])             // fileMapping 日志数据类
+ ├─ parameterApplication (list[Mistake])    // 参数应用日志数据类
+ └─ plugInConfiguration (list[Mistake])     // 插件配置日志数据类
+
+```
 
 
 ### [decorators.py](../core/decorators.py)
@@ -177,34 +186,36 @@ python文件导入模块，定义了一些函数，用于导入python文件
 ```python
 def py_import(file_path: os.path, callObject: str) -> Union[ModuleType, abnormal.PackageImport]:
     """
-    :param callObject: 'main'
+    在 importlib.import_module 中有一个缓存机制
+    如果 sys.module 中有这个包，就会直接返回这个包
+    所以需要在 sys.module 中 临时删除这个包 然后再重新导入
     :param file_path: 绝对路径
+    :param callObject: 'main'
     :return:
 
     """
-    path = copy.copy(sys.path)
     callObject = callObject.split('.')[0]  # 去除 .py
+    # 检查 sys.module 中是否有这个包
+    temporaryPackages = False
+    if callObject in sys.modules:
+        temporaryPackages = sys.modules[callObject]
+        del sys.modules[callObject]
+
     try:
-        sys.path = config.path+[file_path]
+        sys.path.append(file_path)
         the_api = importlib.import_module(callObject)
 
     except Exception:
         the_api = abnormal.PackageImport(traceback.format_exc(), file_path)
 
-    sys.path = path
+    if not isinstance(temporaryPackages, bool):
+        # 恢复 sys.module 中原来的包
+        sys.modules[callObject] = temporaryPackages
+
+    sys.path = sys.path[:-1]  # 去除 sys.path 中最后一个路径
     return the_api
+
 ```
-
-1.首先先将原来的环境进行复制一份
-- `path = copy.copy(sys.path)`
-
-2.路径添加到导入环境中
-- `sys.path = config.path+[file_path]`
-
-3.导入模块
-- `the_api = importlib.import_module(callObject)`
-
-4.然后进行还原环境
 
 所以本质上与Python的导入没有区别
 
@@ -220,6 +231,37 @@ def py_import(file_path: os.path, callObject: str) -> Union[ModuleType, abnormal
 3. 获取需要加载的全部插件
 
 4. 提交给多线程或单线程
+
+#### File 类属性
+
+```text
+File
+ ├─ config                                // 配置数据类 一般是core/config.py
+ ├─ configData                            // 好像是我写错了 应该没有这个属性 实际这个属性没有用到 | 也没有什么属性
+ ├─ logData (LogData[str, list] -> dict)  // 日志数据类
+ |   ├─ fileMapping                           // fileMapping 日志数据类
+ |   ├─ parameterApplication                  // 参数应用日志数据类
+ |   └─ plugInConfiguration                   // 插件配置日志数据类
+ ├─ multithreading                        // 多线程类
+ ├─ path (list[str)                       // 运行插件路径列表(文件夹)
+ ├─ plugInData                            // 插件数据类
+ ├─ plugInRunData                            // 插件运行数据类
+ |   ├─ CallObject                              // 调用对象数据类
+ |   |   └─ Module                                 // 模块数据类
+ |   ├─ Invoke                                  // 调用数据类
+ |   |   └─ ModuleType                             // 模块类型数据(python的内置类)
+ |   ├─ moduleAbnormal (list[插件异常数据类])     // 模块异常数据类
+ |   ├─ pluginConfig (dict[插件配置数据类])       // 插件配置数据类
+ |   └─ Information                             // 插件信息数据类
+ |       ├─ RunTime                                // 运行时间数据类
+ |       |   └─ PluginTimestamp                       // 插件时间戳数据类
+ |       └─ FileInfo                               // 插件信息数据类
+ |           └─ PlugInRetention                       // 插件保留数据类
+ └─ returnValue                           // 插件运行(__init__)返回值数据类
+```
+
+fileMapping 的运行
+[查看文档](core/fileRun.md)
 
 
 
