@@ -17,8 +17,10 @@
 在创建这个`核心类` `(Class.File)`的时候
 
 ```python
+from fileMapping import Class
+
 class File(Class.File):
-    def __init__(self, path: Union[str, list], config: dict): ...
+    def __init__(self, path: Union[str, list], config: dict, pluginConfig: Union[dict, list]): ...
 ```
 
 `config` 这个就是用于给定这个 config.py 的配置参数 
