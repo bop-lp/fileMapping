@@ -37,6 +37,7 @@
 
 参数管理写死在 `fileMapping/core/helperFunctions.py` 文件中的 `__fileFiltering__` 函数
 
+
 ## 保留参数 / 关键词
 
 保留参数是 `插件` 运行时在第一层变量
@@ -141,6 +142,65 @@ def main(fileMapping: Class.File):
 
 ## API
 
-这个是插件怎么调用其他插件的
+### fileMapping
+
+`fileMapping` 的api是在core.helperFunctions文件的
+
+[API 文档](illustrate.md#helperfunctionspy)
+
+### 插件自定义API
+使用 `decorators.appRegistration` 的函数
+
+```python
+from fileMapping.core import decorators
+
+namePluins = "ABC" # 插件名字
+name = "add"  # 可选 默认为函数名字
+
+@decorators.appRegistration(namePluins, name)
+def addition(a, b):
+    return a + b
+```
+
+使用 `decorators.tagAppRegistration` 的函数
+
+这个适用于批量的注册
+
+```python
+from fileMapping.core import decorators
+
+namePluins = "ABC" # 插件名字
+wrapper = decorators.tagAppRegistration(namePluins)
+
+
+@wrapper()
+def add_list(*args):
+    _ = 0
+    for i in args:
+        _ += i
+    return _
+
+@wrapper()
+def add(a, b):
+    return a + b
+```
+
+### 获取API
+
+```python
+from fileMapping.core import helperFunctions
+
+
+add = helperFunctions.getAppRegister("ABC", "add")
+if add == None:
+    # 没有这个API
+    # 需要检查插件是否有运行或者插件的版本
+    ...
+    # 异常处理模块
+
+i = add(1, 6)
+print(i)
+# 预期输出 7
+```
 
 
