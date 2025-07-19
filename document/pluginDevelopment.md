@@ -51,12 +51,13 @@
 # 保留参数的使用例子
 # 这里如果是文件形式的就在文件里中写
 # 这里如果是包/库形式的就在 __init__.py 文件中写
+from fileMapping.core import Class
 
 
-def main():
-    pass
+def init(fileMapping: Class.File):  # fileMapping 在运行init函数的时候会给File类参数名为fileMapping(可选)
+    ...
 
-_init__ = main
+__init__ = init
 
 __level__ = 3
 
@@ -127,7 +128,7 @@ from fileMapping.core import Class
 from fileMapping.core import abnormal
 
 
-def main(fileMapping: Class.File):
+def init(fileMapping: Class.File):
     logInformation: abnormal.Mistake = abnormal.Mistake()
     # 错误信息日志
     namePlugin: str = "xxx"
@@ -202,5 +203,4 @@ i = add(1, 6)
 print(i)
 # 预期输出 7
 ```
-
 
