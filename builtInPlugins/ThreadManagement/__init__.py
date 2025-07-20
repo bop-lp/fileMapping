@@ -17,6 +17,7 @@ class ReadManagement(Class.ParameterApplication):
 
 
 def init(fileMapping: Class.File):
+    pass
 
 
 

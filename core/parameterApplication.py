@@ -165,6 +165,7 @@ class Init(Class.ParameterApplication):
                 self.pointer(key, pointer)
 
 
+
 @wrapper
 class Run(Class.ParameterApplication):
     def __init__(self, self_info: Class.File):

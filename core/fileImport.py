@@ -50,7 +50,7 @@ class Module(Class.Module):
             return self.pointer(**parameterFilling)
 
         except Exception as e:
-            raise abnormal.PackageRun(traceback.format_exc(), self.path, e)
+            return abnormal.PackageRun(traceback.format_exc(), self.path, e)
 
 
 def f(path: str) -> Union[Class.Module, bool]:
