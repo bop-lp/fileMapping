@@ -49,7 +49,7 @@ class DataFolder(Class.ParameterApplication):
 
 
 @decorators.appRegistration(config.__name__)
-def getTemporaryFolders(path: str) -> Optional[str]:
+def getTheDataFolder(path: str) -> Optional[str]:
     if not File.plugInData.get("Folders", False):
         # 没有Folders插件
         return None
