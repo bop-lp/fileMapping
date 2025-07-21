@@ -41,7 +41,12 @@ class DataFolder(Class.ParameterApplication):
         # self.createDict = {<名字>: <绝对路径>, ...}
         for key, path in self.createDict.items():
             returnValue = helperFunctions.mkdir(path)
-            if isinstance(returnValue, abnormal.FolderCreationFailed):
+            if isinstance(returnValue, abnormal.FolderAlreadyExists):
+                # 文件夹已经存在
+                pass
+
+            elif isinstance(returnValue, abnormal.FolderCreationFailed):
+                # 文件夹创建失败
                 self.self_info.logData.parameterApplication.append(returnValue)
                 continue
 

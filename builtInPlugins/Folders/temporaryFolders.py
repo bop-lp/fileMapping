@@ -54,7 +54,12 @@ class TemporaryFolders(Class.ParameterApplication):
 
         for key, path in self.createDict:
             returnValue = helperFunctions.mkdir(os.path.join(self.tempFolderPath, path))
-            if isinstance(returnValue, abnormal.FolderCreationFailed):
+            if isinstance(returnValue, abnormal.FolderAlreadyExists):
+                # 已经存在
+                pass
+
+            elif isinstance(returnValue, abnormal.FolderCreationFailed):
+                # 创建失败
                 self.self_info.logData.parameterApplication.append(returnValue)
                 continue
 

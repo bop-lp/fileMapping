@@ -6,9 +6,10 @@ import functools
 
 from fileMapping.core import Class
 from fileMapping.core import abnormal
+from fileMapping.core.abnormal import FolderCreationFailed, FolderAlreadyExists
 
 
-def mkdir(file_path) -> Union[bool, abnormal.FolderCreationFailed]:
+def mkdir(file_path) -> Union[FolderCreationFailed, bool, FolderAlreadyExists]:
     try:
         if os.path.exists(file_path):
             # 文件夹已存在
@@ -18,8 +19,11 @@ def mkdir(file_path) -> Union[bool, abnormal.FolderCreationFailed]:
         return True
 
     except FileExistsError as e:
-        return abnormal.FolderCreationFailed(file_path, e, traceback.format_exc())
+        return abnormal.FolderAlreadyExists(file_path, e, traceback.format_exc())
 
+    except Exception as e:
+        return abnormal.FolderCreationFailed(file_path, e, traceback.format_exc())
+# FileExistsError(17, '当文件已存在时，无法创建该文件。')
 
 def statistics(filePath: str, file_info: Dict[str, Class.PlugInRetention]) -> Dict[str, str]:
     """

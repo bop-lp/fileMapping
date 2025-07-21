@@ -193,6 +193,14 @@ class Folder(Mistake):
         self.error = error
 
 
+class FolderAlreadyExists(Folder):
+    def english(self) -> str:
+        return f"The folder {self.folderName} already exists"
+
+    def chinese(self) -> str:
+        return f"文件夹 {self.folderName} 已经存在"
+
+
 class FolderCreationFailed(Folder):
     def english(self) -> str:
         return f"Failed to create folder {self.folderName}, error message: {self.error}"
