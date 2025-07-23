@@ -1,6 +1,9 @@
 import os.path
 import traceback
-from typing import Union, Tuple, Dict, List
+from typing import Union, Tuple, Dict, List, Any
+
+from fileMapping.core.Class import FilemappingDict
+from fileMapping.core.abnormal import Mistake
 
 from . import data, abnormal
 from . import Class
@@ -183,7 +186,8 @@ def __singleThreaded__(listOfFiles: dict) -> Class.PlugInRunData:
         raise abnormal.PluginLoopsDependencies(run_order)
 
 
-def getPluginConfig(path: Union[str, dict]) -> Tuple[Dict[str, dict], List[abnormal.Mistake]]:
+def getPluginConfig(path: Union[str, dict]) -> Union[
+    Tuple[dict, List[Any]], Tuple[Dict[str, FilemappingDict], Union[List[Any], List[Mistake]]]]:
     """
     path: dict
         插件配置字典
@@ -213,8 +217,8 @@ def getPluginConfig(path: Union[str, dict]) -> Tuple[Dict[str, dict], List[abnor
             errorMessage = returnValue.moduleAbnormal
 
         # 导入成功
-        # 把 Module 类转化为字典
+        # 类转化 Module -> dict -> FilemappingDict
         return ({
-                    key: helperFunctions.configConvertTodict(value)
+                    key: Class.FilemappingDict(helperFunctions.configConvertTodict(value))
                     for key, value in returnValue.invoke.items()
                 }, errorMessage)
