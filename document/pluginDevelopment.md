@@ -140,6 +140,17 @@ def init(fileMapping: Class.File):
 ```
 
 
+## 数据类
+
+插件运行过程中产生的数据类
+
+可以使用 `data.LogData` 类
+
+```python
+
+
+```
+
 
 ## API
 

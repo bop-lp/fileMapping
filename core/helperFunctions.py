@@ -1,13 +1,15 @@
 import os
 from collections import ChainMap
 from types import FunctionType
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 import inspect
 import traceback
 
+from fileMapping.core.Class import FilemappingDict
 from . import config as Config
 from . import data as fileData
 from . import abnormal
+from . import Class
 
 
 def pathValidation(path_lit: list) -> bool:
@@ -198,7 +200,19 @@ def configureFolders(path: str) -> dict:
     return plugInConfiguration
 
 
+def getPluginDataSpace(namePlugin: str = None) -> Optional[FilemappingDict]:
+    """
+    获取插件数据空间
+    :param namePlugin: 插件名 默认为 None 则获取所有插件数据空间
+    :return:
+    """
+    if namePlugin is None:
+        return fileData.plugInData.plugInData
 
+    if namePlugin in fileData.plugInData.plugInData:
+        return fileData.plugInData.plugInData[namePlugin]
+
+    return None
 
 
 __all__ = [

@@ -12,6 +12,9 @@ class PluginData(Class.PlugInData):
     # parameterApplication => {<插件名字>: {<函数名字>: [FunctionType], ...}, ...}
     decorators: Class.DecoratorsData
     builtInPlugins: Class.FilemappingDict = Class.FilemappingDict()
+    plugInData: Class.FilemappingDict = Class.FilemappingDict()
+    # plugInData 插件数据 是一个字典 key是插件名字 value是插件注册数据
+    # 由插件自已写入数据 应该去看插件的文档/源码
 
     def __init__(self):
         super().__init__()

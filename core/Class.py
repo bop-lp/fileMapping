@@ -333,6 +333,7 @@ class PlugInData(FilemappingDict):
     # parameterApplication: Dict[str, ParameterApplication]
     decorators: DecoratorsData
     builtInPlugins: FilemappingDict
+    plugInData: FilemappingDict
 
 
 # 核心类
