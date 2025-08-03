@@ -1,6 +1,6 @@
 # 这个文件是用来定义类的，包括类属性、方法等
-from typing import Any, Callable, Dict, Union, Tuple, TypeVar, List, ItemsView
-from types import ModuleType, FunctionType
+from typing import Any, Callable, Dict, Union, Tuple, TypeVar, List, Mapping, Iterable, Iterator
+from types import FunctionType
 
 from . import abnormal
 
@@ -67,6 +67,12 @@ class FilemappingDict:
         """批量更新属性"""
         for key, value in other.items():
             setattr(self, key, value)
+
+    def __str__(self) -> str:
+        """定义print打印时的字符串表现形式"""
+        # 以类似字典的格式展示所有属性键值对
+        items = [f"'{k}': {v!r}" for k, v in self.items()]
+        return f"{', '.join(items)}"
 
 
 logData = TypeVar("logData", bound="List[abnormal.Mistake]")
@@ -152,7 +158,7 @@ class Decorators:
 
 # 插件的基本类 一般用不的 就是用来继承的
 class PlugIns(FilemappingDict):
-    def items(self) -> ItemsView[str, Any]:
+    def items(self) -> Iterable[Tuple[str, Any]]:
         # 这里直接调用父类的 items 方法
         return super().items()
 

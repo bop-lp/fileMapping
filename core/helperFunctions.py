@@ -201,6 +201,25 @@ def configureFolders(path: str) -> dict:
     return plugInConfiguration
 
 
+def obtain_args(obj, *args) -> Any:
+    """链式获取对象属性或字典元素（兼容对象和字典）"""
+    current = obj
+    for arg in args:
+        # 优先尝试字典方式获取（如果是字典）
+        if isinstance(current, (dict, FilemappingDict)):
+            if arg not in current:
+                # 若为字典且键不存在，创建空的FilemappingDict（按需调整）
+                current[arg] = FilemappingDict()
+            current = current[arg]
+        else:
+            # 尝试对象属性获取
+            current = getattr(current, arg, None)
+            # 若属性不存在，返回None或抛出异常（根据业务需求调整）
+            if current is None:
+                return None
+    return current
+
+
 def getPluginDataSpace(namePlugin: str = None, *args) -> FilemappingDict:
     """
     获取插件数据空间，支持链式获取子数据
@@ -209,25 +228,6 @@ def getPluginDataSpace(namePlugin: str = None, *args) -> FilemappingDict:
     :param args: 可选的链式参数，用于获取数据空间中的子数据（如'info', 'version'）
     :return: 对应的FilemappingDict对象
     """
-
-    def obtain_args(obj, *args):
-        """链式获取对象属性或字典元素（兼容对象和字典）"""
-        current = obj
-        for arg in args:
-            # 优先尝试字典方式获取（如果是字典）
-            if isinstance(current, (dict, FilemappingDict)):
-                if arg not in current:
-                    # 若为字典且键不存在，创建空的FilemappingDict（按需调整）
-                    current[arg] = FilemappingDict()
-                current = current[arg]
-            else:
-                # 尝试对象属性获取
-                current = getattr(current, arg, None)
-                # 若属性不存在，返回None或抛出异常（根据业务需求调整）
-                if current is None:
-                    return None
-        return current
-
     if namePlugin is None:
         data = fileData.plugInData.plugInData
     else:
@@ -238,6 +238,32 @@ def getPluginDataSpace(namePlugin: str = None, *args) -> FilemappingDict:
     if args:
         return obtain_args(data, *args)
     return data
+
+
+def getPluginData(*args) -> Union[bool, Any]:
+    try:
+        return obtain_args(fileData.plugInData.plugInData, *args)
+
+    except:
+        return False
+
+
+def setPluginData(*args, data: Any) -> Union[bool, Any]:
+    try:
+        returnValue = getPluginData(*args[:-1])
+
+        if isinstance(returnValue, (dict, FilemappingDict)):
+            returnValue[args[-1]] = data
+        else:
+            setattr(returnValue, args[-1], data)
+
+        return True
+
+    except:
+        return False
+
+
+
 
 
 __all__ = [
