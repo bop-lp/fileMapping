@@ -148,6 +148,13 @@ def init(fileMapping: Class.File):
 
 ```python
 
+from fileMapping.core import helperFunctions
+
+
+data = helperFunctions.getPluginDataSpace("pluginName")
+# 这里的 pluginName 是插件名字
+# 这个函数会返回一个 fileMapping 的 FilemappingDict 类
+# 这个类可以用来存储插件运行的数据(需要和其他的插件共享数据 可以使用这个方法)
 
 ```
 

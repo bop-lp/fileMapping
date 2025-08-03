@@ -64,7 +64,6 @@ class File(data.File):
         else:
             self.plugInRunData = __singleThreaded__(listOfFiles)
 
-        # self.plugInRunData.pluginConfig = getPluginConfig(pluginConfig)
         plugInConfiguration, errorMessage = getPluginConfig(pluginConfig)
         if errorMessage.__len__() != 0:
             # 配置错误
