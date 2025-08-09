@@ -1,6 +1,6 @@
 import os
 from collections import ChainMap
-from types import FunctionType
+from types import FunctionType, ClassType
 from typing import List, Optional, Union, Any
 import inspect
 import traceback
@@ -69,6 +69,7 @@ def __fileFiltering__(cpath: os.PathLike, screening: tuple) -> dict:
                 result[key] = init_file
 
     return result
+
 
 def deep_update(dict1: dict, dict2: dict) -> dict:
     """
@@ -201,15 +202,25 @@ def configureFolders(path: str) -> dict:
     return plugInConfiguration
 
 
-def obtain_args(obj, *args) -> Any:
-    """链式获取对象属性或字典元素（兼容对象和字典）"""
+def obtain_args(obj, *args, data: Any = None) -> Any:
+    """
+    获取对象属性或字典元素链式获取对象属性或字典元素（兼容对象和字典）
+
+    :param obj: 对象或字典
+    :param args: 链式参数
+    :param data: 用于获取数据空间中的子数据（如'info', 'version'）
+    :return: Any
+    """
+    if data is None:
+        data = FilemappingDict
+
     current = obj
     for arg in args:
         # 优先尝试字典方式获取（如果是字典）
         if isinstance(current, (dict, FilemappingDict)):
             if arg not in current:
                 # 若为字典且键不存在，创建空的FilemappingDict（按需调整）
-                current[arg] = FilemappingDict()
+                current[arg] = data()
             current = current[arg]
         else:
             # 尝试对象属性获取
@@ -220,7 +231,7 @@ def obtain_args(obj, *args) -> Any:
     return current
 
 
-def getPluginDataSpace(namePlugin: str = None, *args) -> FilemappingDict:
+def getPluginDataSpace(namePlugin: str = None, *args, **kwargs) -> FilemappingDict:
     """
     获取插件数据空间，支持链式获取子数据
 
@@ -229,20 +240,31 @@ def getPluginDataSpace(namePlugin: str = None, *args) -> FilemappingDict:
     :return: 对应的FilemappingDict对象
     """
     if namePlugin is None:
+        # 获取所有插件数据空间
         data = fileData.plugInData.plugInData
     else:
         if namePlugin not in fileData.plugInData.plugInData:
+            # 插件数据不存在，创建空的 FilemappingDict 对象
             fileData.plugInData.plugInData[namePlugin] = FilemappingDict()
+            return fileData.plugInData.plugInData[namePlugin]  # 直接返回空的 FilemappingDict 对象
+
         data = fileData.plugInData.plugInData[namePlugin]
 
     if args:
-        return obtain_args(data, *args)
+        # 链式获取子数据
+        return obtain_args(data, *args, **kwargs)
     return data
 
 
-def getPluginData(*args) -> Union[bool, Any]:
+def getPluginData(*args, **kwargs) -> Union[bool, Any]:
+    """
+    获取插件数据，支持链式获取子数据
+    :param data:
+    :param args:
+    :return:
+    """
     try:
-        return obtain_args(fileData.plugInData.plugInData, *args)
+        return obtain_args(fileData.plugInData.plugInData, *args, **kwargs)
 
     except:
         return False
@@ -263,6 +285,32 @@ def setPluginData(*args, data: Any) -> Union[bool, Any]:
         return False
 
 
+def createADataSpace(nameDataSpace: str, *args, address: Union[List[str], str], relay: Any = None, data: Any = None) -> bool:
+    """
+    创建数据空间
+    可以指定数据空间的地址 也可以指定数据空间的父数据空间 如果父数据空间不存在 则自动创建父数据空间
+    <nameDataSpace>.<*args>.<address> -> data
+    :param nameDataSpace: 数据空间名
+    :param args: 可选的链式参数，用于指定数据空间的子数据（如'info', 'version'）
+    :param address: 数据空间的地址，可以是字符串或列表
+    :param relay: 是否将数据空间的地址作为父数据空间的子数据
+    :param data: 数据空间的值
+    :return: bool
+    """
+    if isinstance(address, str):
+        address: List[str] = [address]
+
+    if data is None:
+        data = FilemappingDict()
+
+    for i in address:
+        kwargs = {"data": relay} if isinstance(relay, type) else {}
+        getPluginData(nameDataSpace, *args, i, **kwargs)
+        # 若父数据空间不存在 使用 relay 创建父数据空间
+        getPluginData(nameDataSpace, *args, i, data=data)
+
+    else:
+        return True
 
 
 

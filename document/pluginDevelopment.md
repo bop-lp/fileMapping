@@ -138,7 +138,7 @@ def init(fileMapping: Class.File):
     fileMapping.logData[namePlugin].append(logInformation)
 
 ```
-
+[parameterApplication.py](../core/parameterApplication.py)
 
 ## 数据类
 

@@ -6,7 +6,6 @@ fileMappingConfig.functions
 """
 import atexit
 import functools
-import os
 import traceback
 import types
 from types import FunctionType
@@ -74,6 +73,7 @@ def wrapper(func: Class.ParameterApplication):
     return func
 
 
+
 @wrapper
 class PlugInData(Class.ParameterApplication):
     def init(self):
@@ -131,6 +131,7 @@ class Config(Class.ParameterApplication):
                 plugInsConfig = helperFunctions.deep_update(plugInsConfig.config, plugInsObject)
                 self.plugInData[plugInsName].config = plugInsConfig
 
+
 @wrapper
 class Init(Class.ParameterApplication):
     def __init__(self, self_info: Class.File):
@@ -163,7 +164,6 @@ class Init(Class.ParameterApplication):
 
             elif isinstance(pointer, FunctionType):
                 self.pointer(key, pointer)
-
 
 
 @wrapper
