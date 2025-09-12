@@ -1,6 +1,6 @@
 import os
 from collections import ChainMap
-from types import FunctionType, ClassType
+from types import FunctionType
 from typing import List, Optional, Union, Any
 import inspect
 import traceback

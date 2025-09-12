@@ -15,10 +15,12 @@ class Mistake(Exception):
     stack: str = ''
     # 栈的记录
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, stack: str, *args: Any, **kwargs: Any) -> None:
         self.listOfLanguages = [
             self.english, self.chinese
         ]
+        self.stack: str = stack
+        self.error: str = ''
 
     def english(self) -> str: ...
 
@@ -29,7 +31,7 @@ class Package(Mistake):
     stack: str = ''
     packageName: str = ''
     def __init__(self, stack: str, packageName: str):
-        super().__init__()
+        super().__init__(stack, packageName)
 
         self.stack = stack
         self.packageName = packageName
@@ -59,8 +61,8 @@ class PackageRun(Package):
 class PlugIns(Mistake):
     nameOfThePlugin: str
 
-    def __init__(self, nameOfThePlugin: str):
-        super().__init__()
+    def __init__(self, stack: str, nameOfThePlugin: str):
+        super().__init__(stack, nameOfThePlugin)
 
         self.stack = ''
         self.nameOfThePlugin = nameOfThePlugin
@@ -68,8 +70,8 @@ class PlugIns(Mistake):
 
 class PluginDependencies(PlugIns):
     dependenciesOnPlugins: str
-    def __init__(self, nameOfThePlugin: str, dependenciesOnPlugins: str):
-        super().__init__(nameOfThePlugin)
+    def __init__(self, nameOfThePlugin: str, dependenciesOnPlugins: str, stack: str = ''):
+        super().__init__(stack, nameOfThePlugin)
 
         self.dependenciesOnPlugins = dependenciesOnPlugins
 
@@ -83,8 +85,8 @@ class PluginDependencies(PlugIns):
 class PluginLoopsDependencies(PlugIns):
     plugInLoops: Union[list, tuple]
 
-    def __init__(self, plugInLoops: Union[list, tuple]):
-        super().__init__('')
+    def __init__(self, plugInLoops: Union[list, tuple], stack: str = ''):
+        super().__init__(stack, plugInLoops)
 
         self.plugInLoops = plugInLoops
 
@@ -99,7 +101,7 @@ class PluginEndError(PlugIns):
     error: str
     stack: str
     def __init__(self, nameOfThePlugin: str, error: str, stack: str):
-        super().__init__(nameOfThePlugin)
+        super().__init__(stack, nameOfThePlugin)
 
         self.stack = stack
         self.error = error
@@ -117,7 +119,7 @@ class ParameterApplication(Mistake):
     stack: str
 
     def __init__(self, ApplicationName: str, error: str, stack: str):
-        super().__init__()
+        super().__init__(stack, ApplicationName)
 
         self.ApplicationName = ApplicationName
         self.error = error
@@ -167,7 +169,7 @@ class PlugInsConfigTypeError(PlugInsConfig):
 
 class PlugInConfigurationIsIncorrect(PlugInsConfig):
     def __init__(self, selfPlugInName: str, error: str, stack: str):
-        super().__init__(selfPlugInName)
+        super().__init__(stack, selfPlugInName)
 
         self.error = error
         self.stack = stack

@@ -169,6 +169,10 @@ class Init(Class.ParameterApplication):
 @wrapper
 class Run(Class.ParameterApplication):
     def __init__(self, self_info: Class.File):
+        """
+        运行插件的 "run" / "__run__" 函数
+        :param self_info:
+        """
         super().__init__(self_info)
 
         self.self_info = self_info
@@ -226,3 +230,19 @@ class End(Class.ParameterApplication):
 
             self.run(pointer)
 
+
+# @wrapper
+# class FunctionCheck(Class.ParameterApplication):
+#     def __init__(self, self_info: Class.File):
+#         """
+#         检查插件的函数是否存在
+#
+#         :param self_info:
+#         """
+#         super().__init__(self_info)
+#
+#
+#     def init(self):
+#         for key, value in self.self_info.plugInRunData.invoke.items():
+#
+#
