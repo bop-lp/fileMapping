@@ -138,6 +138,7 @@ class Module:
     path: str
     packageName: str
     absolutePath: str
+    pointer: Callable
 
     def __init__(self, path: str):
         self.path = path
@@ -158,7 +159,7 @@ class Decorators:
 
 # 插件的基本类 一般用不的 就是用来继承的
 class PlugIns(FilemappingDict):
-    def items(self) -> Iterable[Tuple[str, Any]]:
+    def items(self) -> Iterable[Tuple[str, Module]]:
         # 这里直接调用父类的 items 方法
         return super().items()
 

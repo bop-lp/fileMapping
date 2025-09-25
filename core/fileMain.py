@@ -1,6 +1,9 @@
 import os.path
 import traceback
+import asyncio
 from typing import Union, Tuple, Dict, List, Any
+
+import rich
 
 from fileMapping.core.Class import FilemappingDict
 from fileMapping.core.abnormal import Mistake
@@ -17,6 +20,9 @@ from . import multiThreadedHelperFunctions
 from . import wordProcessing
 from . import fileImport
 from . import parameterApplication
+
+# 异步文件
+from . import asynchronous
 
 
 class File(data.File):
@@ -92,6 +98,31 @@ class File(data.File):
         """
         for key, value in self.plugInRunData.callObject.items():
             self._run_(key, value, **kwargs)
+
+    def asynchronousRun(self, **kwargs):
+        """
+        异步运行
+        :return:
+        """
+        kwargs = {
+            "fileMapping": self,
+            **kwargs
+        }
+        func = [
+            value.pointer
+            for key, value in self.plugInRunData.callObject.items()
+            if not (value.pointer is None)
+        ]
+
+        returnValue = asyncio.run(asynchronous.async_packaging(func, **kwargs).run())
+        _ = 0
+        for key, value in self.plugInRunData.callObject.items():
+            if value.pointer is None:
+                continue
+
+            self.returnValue[key] = returnValue[_]
+            _ += 1
+
 
     def _run_(self, theNameOfThePlugin: str, func: Class.Module, **kwargs) -> None:
         kwargs = {
